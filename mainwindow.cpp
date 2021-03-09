@@ -52,7 +52,7 @@ void MainWindow::on_pushButton_clicked()                                        
                ui->coordY->text().toDouble() < ui->graphicsView->height()/2 - 25 &&
                ui->operationWidth->text().toDouble() >=1 &&
                ui->operationWidth->text().toDouble() <= 70 &&
-               ui->operationHeight->text().toDouble() >=30 &&
+               ui->operationHeight->text().toDouble() >= 30 &&
                ui->operationHeight->text().toDouble() < 150)             //Проверка чтобы вводимые данные не выходили за границы представления
             {
                 if(ui->comboBox_4->currentIndex() == 0)
@@ -320,5 +320,12 @@ void MainWindow::on_setMaxWidthOperation_clicked()
     {
         if(!scene->setMaxWidthOperation(ui->comboBox_5->currentIndex()))
             QMessageBox::warning(this,"Неккоректная операция","Операция не статическая");
+    }
+}
+void MainWindow::mode(QString name)
+{
+    if(name == "Запись информации")
+    {
+        scene->recordingInformation();
     }
 }

@@ -15,7 +15,8 @@ SOURCES += \
     mygraphicscene.cpp \
     onoff.cpp \
     operation.cpp \
-    resizeoperation.cpp
+    resizeoperation.cpp \
+    secondwindow.cpp
 
 HEADERS += \
     Structures.h \
@@ -24,10 +25,12 @@ HEADERS += \
     mygraphicscene.h \
     onoff.h \
     operation.h \
-    resizeoperation.h
+    resizeoperation.h \
+    secondwindow.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    secondwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

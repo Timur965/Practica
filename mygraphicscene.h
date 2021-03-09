@@ -28,6 +28,7 @@ public:
     bool setMaxWidthOperation(int index);
     void on(int coord=59);
     void off(int coord=59);
+    void recordingInformation();
     QString getCurrentName();
     QVector<QString> getNamesOperations();
     double width;

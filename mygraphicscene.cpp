@@ -44,6 +44,11 @@ bool MyGraphicScene::addOperations(QString name, double x, double y, double widt
         connect(op,&Operation::changeOperation,this,&MyGraphicScene::processingChange);
         connect(op,&Operation::releaseResizeOperation,this,&MyGraphicScene::processingRelease);
         operations.push_back(op);                                                                                            //Добавляем указатель на операцию в вектор
+        if(op->inQueue)
+        {
+            listOperations.push_back(op);
+            this->createQueue();
+        }
         op->setSceneSize(this->width,this->height);
         this->addItem(op);                                                                                                   //Добавляем операцию на сцену
         this->update();                                                                                                      //Обновляем сцену
@@ -98,7 +103,6 @@ void MyGraphicScene::updateCoordOperations(int coord)
     {
         foreach(Operation *ops, operations)
         {
-            ops->setPos(ops->pos().x(),ops->pos().y());
             ops->setSceneSize(this->width,this->height);
             ops->setCoordStart(coord);
             this->update();
@@ -232,6 +236,7 @@ void MyGraphicScene::on(int coord)
     On->height = 50;
     On->name = "Т0";
     this->addItem(On);
+    this->update();
 }
 void MyGraphicScene::off(int coord)
 {
@@ -247,6 +252,7 @@ void MyGraphicScene::off(int coord)
     Off->height = 50;
     Off->name = "Тк";
     this->addItem(Off);
+    this->update();
 }
 bool MyGraphicScene::setMinWidthOperation(int index)
 {
@@ -265,4 +271,16 @@ bool MyGraphicScene::setMaxWidthOperation(int index)
         return true;
     }
     return false;
+}
+void MyGraphicScene::recordingInformation()
+{
+    on();
+    addOperations("",0,0,60,30,true,true);
+    addOperations("",0,0,10,30,true,true);
+    addOperations("",0,0,30,30,true,true);
+    addOperations("",0,0,30,30,true,true);
+    addOperations("",0,0,30,30,true,true);
+    addOperations("",0,0,40,30,true,true);
+    addOperations("",0,0,10,30,true,true);
+    off();
 }

@@ -21,6 +21,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void mode(QString name);
 private:
     Ui::MainWindow *ui;
     MyGraphicScene *scene=nullptr;                                          //Объявляем собственную графическую сцену
