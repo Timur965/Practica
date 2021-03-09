@@ -6,6 +6,7 @@ SecondWindow::SecondWindow(QWidget *parent) :
     ui(new Ui::SecondWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("Выбор режима");
 }
 
 SecondWindow::~SecondWindow()
