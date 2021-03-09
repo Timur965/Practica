@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     scene = new MyGraphicScene(this);                                                      //Инициализируем графическую сцену
     scene->setSceneRect(28,10,ui->graphicsView->width()-28,ui->graphicsView->height()-10); //Устанавливаем границы сцены
     ui->graphicsView->setScene(scene);                                                     //Устанавливаем текущую сцену равной scene
+    ui->graphicsView->setMinimumWidth(0);
+    ui->graphicsView->setMaximumWidth(754);
     ui->graphicsView->installEventFilter(this);                                            //Устанавливаем фильтр события на представление
     setWindowTitle("Разработка циклограммы");                                              //Устанавливаем заголовок окну
     ui->comboBox->setDuplicatesEnabled(true);
@@ -200,6 +202,7 @@ void MainWindow::updateIncreaseView()
 {
     ui->graphicsView->setMinimumWidth(ui->graphicsView->width() + 240);
     scene->createQueue();
+    scene->updateCoordOperations();
     scene->on();
 }
 void MainWindow::updateDecreaseView()
@@ -207,6 +210,7 @@ void MainWindow::updateDecreaseView()
     ui->graphicsView->setMinimumWidth(ui->graphicsView->width() - 240);
     ui->graphicsView->setMaximumWidth(ui->graphicsView->width() + 240);
     scene->createQueue(180);
+    scene->updateCoordOperations(180);
     scene->on(179);
 }
 

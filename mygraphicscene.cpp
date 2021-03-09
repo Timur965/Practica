@@ -92,6 +92,19 @@ void MyGraphicScene::drawBackground(QPainter *painter, const QRectF &rect)      
     painter->drawLine(width/2+40,height/2-30,width/2+57,height/2-15);                                                        //Рисуем верхнюю стороны стрелки
     painter->drawLine(width/2+40,height/2,width/2+57,height/2-15);                                                           //Рисуем нижнюю стороны стрелки
 }
+void MyGraphicScene::updateCoordOperations(int coord)
+{
+    if(operations.count() != 0)
+    {
+        foreach(Operation *ops, operations)
+        {
+            ops->setPos(ops->pos().x(),ops->pos().y());
+            ops->setSceneSize(this->width,this->height);
+            ops->setCoordStart(coord);
+            this->update();
+        }
+    }
+}
 void MyGraphicScene::createQueue(int coord)
 {
     if(listOperations.count() != 0)

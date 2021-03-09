@@ -21,6 +21,7 @@ public:
     void deleteOperations(int index);                                                                                              // Метод для удаления операции со сцены
     void createQueue(int coord = 60);
     void addList(int index, QString whereToAdd);
+    void updateCoordOperations(int coord = 60);
     bool inFile(QString path);
     bool outFile(QString path);
     bool setMinWidthOperation(int index);
