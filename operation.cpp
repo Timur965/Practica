@@ -49,6 +49,16 @@ void Operation::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
         painter->drawLine(x-2,y-height-2,width+2+x,y-height-2);  //Верхняя
         painter->drawLine(x-2,y-height-2,x-2,y+2);               //Левая
         painter->drawLine(x+width+2,y-height-2,x+width+2,y+2);   //Правая
+        painter->drawText(0,rect.bottomLeft().y()+40,rect.width()+35,rect.height(),Qt::AlignLeft,"Tн"+name.left(2)+name.right(1));
+        if(this->width > 75)
+            painter->drawText(-3,rect.bottomLeft().y()+40,rect.width(),rect.height(),Qt::AlignRight,"Tк"+name.left(2)+name.right(1));
+        else
+        {
+            if(this->width > 50 && this->width < 75)
+                painter->drawText(-3,rect.bottomLeft().y()+50,rect.width(),rect.height(),Qt::AlignRight,"Tк"+name.left(2)+name.right(1));
+            else
+                painter->drawText(-3,rect.bottomLeft().y()+50,rect.width()+35,rect.height(),Qt::AlignRight,"Tк"+name.left(2)+name.right(1));
+        }
     }
     start = (sceneWidth/2 + this->pos().x()-coordStart)/coef;
     end = ((sceneWidth/2 + this->pos().x()+this->width)-coordStart)/coef;
@@ -62,11 +72,6 @@ void Operation::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     if(inQueue)
     {
         brush=Qt::magenta;
-        painter->drawText(0,rect.bottomLeft().y()+40,rect.width()+30,rect.height(),Qt::AlignLeft,"Tн"+name.left(2)+name.right(1));
-        if(this->width < 75)
-            painter->drawText(-3,rect.bottomLeft().y()+50,rect.width(),rect.height(),Qt::AlignRight,"Tк"+name.left(2)+name.right(1));
-        else
-            painter->drawText(-3,rect.bottomLeft().y()+40,rect.width(),rect.height(),Qt::AlignRight,"Tк"+name.left(2)+name.right(1));
     }
     if(inQueue && !dynamic)
         brush=Qt::darkMagenta;
@@ -174,7 +179,7 @@ void Operation::mouseMoveEvent(QGraphicsSceneMouseEvent *event)                 
 
 void Operation::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)                                  //Отпустили операцию
 {
-    if(this->pos().x() < -sceneWidth/2+58 || this->pos().x()+width > sceneWidth/2+60 || this->pos().y() < -sceneHeight/2+80 || this->pos().y() > sceneHeight/2 - 28)
+    if(this->pos().x() < -sceneWidth/2+58 || this->pos().x()+width > sceneWidth/2+60 || this->pos().y() < -sceneHeight/2+80 || this->pos().y() > sceneHeight/2 - 48)
     {                                                                                               //Если операция вышла за границы сцены возвращяем её на предидущии координаты
        this->setPos(prx,pry);
     }

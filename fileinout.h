@@ -13,8 +13,10 @@ class FileInOut
 public:
     FileInOut();
     ~FileInOut();
-    bool inputFile(QVector<Operation*> operations,QString path);
-    bool outputFile(QString path,QVector<Geometry> *vectorGeom);
+    bool inputJSONFile(QVector<Operation*> operations,QString path);
+    bool outputJSONFile(QString path,QVector<Geometry> *vectorGeom);
+    bool outputFile(QString path,QStringList *list);
+    bool outputCurrentEquipment(QString path,QStringList *list, const QString &arg1);
 };
 
 #endif // FILEINOUT_H

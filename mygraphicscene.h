@@ -19,7 +19,7 @@ public:
                                                                                                                                    // Метод для добавления операции на сцену
     bool updateOperations(int index, QString name, double x, double y, double width, double height);                               // Метод для обновления операции на сцене
     void deleteOperations(int index);                                                                                              // Метод для удаления операции со сцены
-    void createQueue(int coord = 60);
+    void createQueue(int coord = 60, int coordHeight = 50);
     void addList(int index, QString whereToAdd);
     void updateCoordOperations(int coord = 60);
     bool inFile(QString path);

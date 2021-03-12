@@ -80,22 +80,22 @@ void MyGraphicScene::drawBackground(QPainter *painter, const QRectF &rect)      
 {
     Q_UNUSED(rect);
     painter->setPen(QPen(Qt::black));                                                                                        //Устанавливаем цвет пера
-    painter->drawLine(-width/2+59,height/2-15,width,height/2-15);                                                            //Рисуем линию на весь размер представления
+    painter->drawLine(-width/2+59,height/2-35,width,height/2-35);                                                            //Рисуем линию на весь размер представления
     for(int i=-width/2+59;i<width/2+30;i=i+30)                                                                               //Рисуем вертикальные линии
     {
-        painter->drawLine(i,height/2-25,i,height/2-5);
+        painter->drawLine(i,height/2-45,i,height/2-25);
     }
     int x=0;
     for(int i=-width/2+59;i<(width/2+60);i=i+60)                                                                               //Рисуем значения
     {
         if(i<=width/2+59)
-            painter->drawText(i,height/2+5,QString::number(x));
+            painter->drawText(i,height/2-15,QString::number(x));
         else
-            painter->drawText(i/2+15,height/2+5,QString::number(x));
+            painter->drawText(i/2+15,height/2-15,QString::number(x));
         x +=60/Operation::getCoef();
     }
-    painter->drawLine(width/2+40,height/2-30,width/2+57,height/2-15);                                                        //Рисуем верхнюю стороны стрелки
-    painter->drawLine(width/2+40,height/2,width/2+57,height/2-15);                                                           //Рисуем нижнюю стороны стрелки
+    painter->drawLine(width/2+40,height/2-50,width/2+57,height/2-35);                                                        //Рисуем верхнюю стороны стрелки
+    painter->drawLine(width/2+40,height/2-20,width/2+57,height/2-35);                                                           //Рисуем нижнюю стороны стрелки
 }
 void MyGraphicScene::updateCoordOperations(int coord)
 {
@@ -109,12 +109,12 @@ void MyGraphicScene::updateCoordOperations(int coord)
         }
     }
 }
-void MyGraphicScene::createQueue(int coord)
+void MyGraphicScene::createQueue(int coord, int coordHeight)
 {
     if(listOperations.count() != 0)
     {
         double x = -width/2+coord;
-        double y = height/2-30;
+        double y = height/2-coordHeight;
         foreach(Operation *ops, listOperations)
         {
             if(x+ops->width <= width/2+coord)
@@ -187,7 +187,7 @@ void MyGraphicScene::addList(int index, QString whereToAdd)
 }
 bool MyGraphicScene::inFile(QString path)
 {
-    if(!operations.empty() && fileInOut->inputFile(operations,path))
+    if(!operations.empty() && fileInOut->inputJSONFile(operations,path))
     {
         return true;
     }
@@ -196,7 +196,7 @@ bool MyGraphicScene::inFile(QString path)
 bool MyGraphicScene::outFile(QString path)
 {
     vectorGeometry = new QVector<Geometry>();
-    fileInOut->outputFile(path,vectorGeometry);
+    fileInOut->outputJSONFile(path,vectorGeometry);
     if(!vectorGeometry->empty())
     {
         foreach(Geometry geom, *vectorGeometry)
@@ -231,7 +231,7 @@ void MyGraphicScene::on(int coord)
     }
     On = new onOff();
     On->x = -width/2+coord;
-    On->y = height/2-5;
+    On->y = height/2-25;
     On->width = 1;
     On->height = 50;
     On->name = "Т0";
@@ -247,7 +247,7 @@ void MyGraphicScene::off(int coord)
         x = x+ops->width;
     }
     Off->x = x;
-    Off->y = height/2-5;
+    Off->y = height/2-25;
     Off->width = 1;
     Off->height = 50;
     Off->name = "Тк";

@@ -7,7 +7,7 @@ FileInOut::FileInOut()
 FileInOut::~FileInOut()
 {
 }
-bool FileInOut::inputFile(QVector<Operation *> operations, QString path)
+bool FileInOut::inputJSONFile(QVector<Operation *> operations, QString path)
 {
     QFile file1(path);
     QTextStream stream(&file1);
@@ -42,7 +42,7 @@ bool FileInOut::inputFile(QVector<Operation *> operations, QString path)
        return false;
     }
 }
-bool FileInOut::outputFile(QString path, QVector<Geometry> *vectorGeom)
+bool FileInOut::outputJSONFile(QString path, QVector<Geometry> *vectorGeom)
 {
     QFile file1(path);
     QJsonObject jsObj;
@@ -71,5 +71,41 @@ bool FileInOut::outputFile(QString path, QVector<Geometry> *vectorGeom)
         return true;
     }
 
+    return false;
+}
+bool FileInOut::outputFile(QString path, QStringList *list)
+{
+    QFile file(path);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QString textLine;
+        while (!file.atEnd()) {
+            textLine = file.readLine();
+            list->push_back(textLine.left(textLine.indexOf(':')));
+        }
+        file.close();
+        return true;
+    }
+    return false;
+}
+bool FileInOut::outputCurrentEquipment(QString path, QStringList *list, const QString &arg1)
+{
+    QFile file(path);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QString textLine;
+        while(!file.atEnd())
+        {
+            textLine = file.readLine();
+            if(textLine.indexOf(arg1) != -1)
+            {
+                textLine = textLine.remove(0,textLine.indexOf(':')+2);
+                list->append(textLine.split(','));
+                break;
+            }
+        }
+        file.close();
+        return true;
+    }
     return false;
 }

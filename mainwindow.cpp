@@ -49,7 +49,7 @@ void MainWindow::on_pushButton_clicked()                                        
             if(ui->coordX->text().toDouble() > (ui->graphicsView->width()/2 - ui->graphicsView->width())+55 &&
                ui->coordX->text().toDouble() < ui->graphicsView->width()/2 - 40 &&
                ui->coordY->text().toDouble() > (ui->graphicsView->height()/2 - ui->graphicsView->height())+80 &&
-               ui->coordY->text().toDouble() < ui->graphicsView->height()/2 - 25 &&
+               ui->coordY->text().toDouble() < ui->graphicsView->height()/2 - 45 &&
                ui->operationWidth->text().toDouble() >=1 &&
                ui->operationWidth->text().toDouble() <= 70 &&
                ui->operationHeight->text().toDouble() >= 30 &&
@@ -99,7 +99,7 @@ void MainWindow::on_pushButton_2_clicked()                                      
             if(ui->newCoordX->text().toDouble() > (ui->graphicsView->width()/2 - ui->graphicsView->width())+55 &&
                ui->newCoordX->text().toDouble() < ui->graphicsView->width()/2 - 40 &&
                ui->newCoordY->text().toDouble() > (ui->graphicsView->height()/2 - ui->graphicsView->height())+80 &&
-               ui->newCoordY->text().toDouble() < ui->graphicsView->height()/2 - 25 &&
+               ui->newCoordY->text().toDouble() < ui->graphicsView->height()/2 - 45 &&
                ui->newOperationWidth->text().toDouble() >=1 &&
                ui->newOperationWidth->text().toDouble() <= 70 &&
                ui->newOperationHeight->text().toDouble() >=30 &&
@@ -201,7 +201,7 @@ void MainWindow::on_pushButton_4_clicked()
 void MainWindow::updateIncreaseView()
 {
     ui->graphicsView->setMinimumWidth(ui->graphicsView->width() + 240);
-    scene->createQueue();
+    scene->createQueue(60,60);
     scene->updateCoordOperations();
     scene->on();
 }
