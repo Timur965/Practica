@@ -15,7 +15,6 @@ public:
     bool insertTable(QString nameTable, QStringList value);
     bool updateTable(QString nameTable, QString nameColumn, QString Value, QString newValue);
     bool deleteRow(QString nameTable, QString id);
-    QString Error();
 private:
     QSqlDatabase db;
 };
