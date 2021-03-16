@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.14.0, 2021-03-13T14:40:09. -->
+<!-- Written by QtCreator 4.14.0, 2021-03-16T13:58:58. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -69,6 +69,7 @@
     <value type="Qt::CheckState" key="C:/Projects/Diplom/Test/test_database.cpp:createTable">Checked</value>
     <value type="Qt::CheckState" key="C:/Projects/Diplom/Test/test_database.cpp:deleteRow">Checked</value>
     <value type="Qt::CheckState" key="C:/Projects/Diplom/Test/test_database.cpp:insertTable">Checked</value>
+    <value type="Qt::CheckState" key="C:/Projects/Diplom/Test/test_database.cpp:outputFromTable">Checked</value>
     <value type="Qt::CheckState" key="C:/Projects/Diplom/Test/test_database.cpp:updateTable">Checked</value>
     <value type="Qt::CheckState" key="C:/Projects/Diplom/Test/test_database.h:Test_Database">Checked</value>
    </valuemap>

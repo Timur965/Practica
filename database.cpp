@@ -24,9 +24,9 @@ bool DataBase::connection(QString login, QString password, QString host, QString
 }
 bool DataBase::createTable(QString nameTable, QStringList columns)
 {
-    QSqlQuery query;
     if(db.isOpen())
     {
+        QSqlQuery query;
         QString textQuery;
         textQuery = "CREATE TABLE "+nameTable+" (";
         foreach(QString str,columns)
@@ -46,9 +46,9 @@ bool DataBase::createTable(QString nameTable, QStringList columns)
 }
 bool DataBase::insertTable(QString nameTable, QStringList value)
 {
-    QSqlQuery query;
     if(db.isOpen())
     {
+        QSqlQuery query;
         QString textQuery;
         foreach(QString str, value)
         {
@@ -66,9 +66,9 @@ bool DataBase::insertTable(QString nameTable, QStringList value)
 }
 bool DataBase::updateTable(QString nameTable, QString nameColumn, QString value, QString newValue)
 {
-    QSqlQuery query;
     if(db.isOpen())
     {
+        QSqlQuery query;
         if(query.exec("UPDATE "+nameTable+" SET "+nameColumn+"="+"\'"+newValue+"\'"+" WHERE "+nameColumn+" = "+"\'"+value+"\'"))
         {
             return true;
@@ -78,11 +78,39 @@ bool DataBase::updateTable(QString nameTable, QString nameColumn, QString value,
 }
 bool DataBase::deleteRow(QString nameTable, QString index)
 {
-    QSqlQuery query;
     if(db.isOpen())
     {
+        QSqlQuery query;
         if(query.exec("DELETE FROM "+nameTable+" WHERE id="+index))
         {
+            return true;
+        }
+    }
+    return false;
+}
+bool DataBase::outputFromTable(QString nameDatabase, QString nameTable, QStringList *result)
+{
+    if(db.isOpen())
+    {
+        QSqlQuery query;
+        query.exec("SELECT COUNT(data_type) FROM information_schema.columns WHERE table_catalog = '"+nameDatabase+"' AND table_name = '"+nameTable.toLower()+"'");
+        query.next();
+        int n = query.value(0).toInt();
+        QString column;
+        if(query.exec("SELECT * FROM "+nameTable))
+        {
+            while (query.next()) {
+                for(int i = 0; i < n; i++)
+                {
+                    if(i != n-1)
+                        column += query.value(i).toString()+",";
+                    else
+                        column += query.value(i).toString();
+                }
+                result->push_back(column);
+                qDebug()<<column;
+                column="";
+            }
             return true;
         }
     }

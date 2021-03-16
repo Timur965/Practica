@@ -4,6 +4,7 @@
 #include <QtSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QMap>
 
 class DataBase
 {
@@ -15,6 +16,7 @@ public:
     bool insertTable(QString nameTable, QStringList value);
     bool updateTable(QString nameTable, QString nameColumn, QString Value, QString newValue);
     bool deleteRow(QString nameTable, QString id);
+    bool outputFromTable(QString nameDatabase, QString nameTable, QStringList *result);
 private:
     QSqlDatabase db;
 };
