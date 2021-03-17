@@ -21,7 +21,7 @@ void Test_Database::insertTable()
     columns.push_back("1");
     columns.push_back("Ivan");
     QCOMPARE(database.insertTable("ExampleTable",columns),true);
-    insertValue.push_back(columns.at(0)+","+columns.at(1));
+    insertValue.push_back(QString("%1,%2").arg(columns.at(0),columns.at(1)));
 }
 void Test_Database::outputFromTable()
 {

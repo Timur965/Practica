@@ -26,8 +26,8 @@ public:
     bool outFile(QString path);
     bool setMinWidthOperation(int index);
     bool setMaxWidthOperation(int index);
-    void on(int coord=59);
-    void off(int coord=59);
+    void on(int coord=59, int coordHeight = 25);
+    void off(int coord=59,int coordHeight = 25);
     void recordingInformation();
     QString getCurrentName();
     QVector<QString> getNamesOperations();

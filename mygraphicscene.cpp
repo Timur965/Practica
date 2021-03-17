@@ -142,7 +142,7 @@ void MyGraphicScene::processingChange()
     {
         if(focusOperation == ops && ops->inQueue)
         {
-                createQueue();
+                this->createQueue();
                 break;
         }
     }
@@ -216,7 +216,7 @@ bool MyGraphicScene::outFile(QString path)
     }
     return false;
 }
-void MyGraphicScene::on(int coord)
+void MyGraphicScene::on(int coord, int coordHeight)
 {
     if(On !=nullptr)
     {
@@ -231,14 +231,14 @@ void MyGraphicScene::on(int coord)
     }
     On = new onOff();
     On->x = -width/2+coord;
-    On->y = height/2-25;
+    On->y = height/2-coordHeight;
     On->width = 1;
     On->height = 50;
     On->name = "Т0";
     this->addItem(On);
     this->update();
 }
-void MyGraphicScene::off(int coord)
+void MyGraphicScene::off(int coord, int coordHeight)
 {
     Off = new onOff();
     double x = -width/2+coord;
@@ -247,7 +247,7 @@ void MyGraphicScene::off(int coord)
         x = x+ops->width;
     }
     Off->x = x;
-    Off->y = height/2-25;
+    Off->y = height/2-coordHeight;
     Off->width = 1;
     Off->height = 50;
     Off->name = "Тк";

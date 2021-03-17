@@ -28,13 +28,13 @@ bool DataBase::createTable(QString nameTable, QStringList columns)
     {
         QSqlQuery query;
         QString textQuery;
-        textQuery = "CREATE TABLE "+nameTable+" (";
+        textQuery = QString("CREATE TABLE %1 (").arg(nameTable);
         foreach(QString str,columns)
         {
             if(str!=columns.last())
-                textQuery += str+",";
+                textQuery += QString("%1,").arg(str);
             else
-                textQuery +=str;
+                textQuery += QString("%1").arg(str);
         }
         textQuery +=")";
         if(query.exec(textQuery))
@@ -53,11 +53,11 @@ bool DataBase::insertTable(QString nameTable, QStringList value)
         foreach(QString str, value)
         {
             if(str!=value.last())
-                textQuery += "\'"+str+"\',";
+                textQuery += QString("'%1',").arg(str);
             else
-                textQuery += "\'"+str+"\'";
+                textQuery += QString("'%1'").arg(str);
         }
-        if(query.exec("INSERT INTO "+nameTable+" VALUES("+textQuery+")"))
+        if(query.exec(QString("INSERT INTO %1 VALUES(%2)").arg(nameTable,textQuery)))
         {
             return true;
         }
@@ -69,7 +69,7 @@ bool DataBase::updateTable(QString nameTable, QString nameColumn, QString value,
     if(db.isOpen())
     {
         QSqlQuery query;
-        if(query.exec("UPDATE "+nameTable+" SET "+nameColumn+"="+"\'"+newValue+"\'"+" WHERE "+nameColumn+" = "+"\'"+value+"\'"))
+        if(query.exec(QString("UPDATE %1 SET %2 = '%3' WHERE %4 = '%5'").arg(nameTable,nameColumn,newValue,nameColumn,value)))
         {
             return true;
         }
@@ -81,7 +81,7 @@ bool DataBase::deleteRow(QString nameTable, QString index)
     if(db.isOpen())
     {
         QSqlQuery query;
-        if(query.exec("DELETE FROM "+nameTable+" WHERE id="+index))
+        if(query.exec(QString("DELETE FROM %1 WHERE id=%2").arg(nameTable,index)))
         {
             return true;
         }
@@ -93,11 +93,11 @@ bool DataBase::outputFromTable(QString nameDatabase, QString nameTable, QStringL
     if(db.isOpen())
     {
         QSqlQuery query;
-        query.exec("SELECT COUNT(data_type) FROM information_schema.columns WHERE table_catalog = '"+nameDatabase+"' AND table_name = '"+nameTable.toLower()+"'");
+        query.exec(QString("SELECT COUNT(data_type) FROM information_schema.columns WHERE table_catalog = '%1' AND table_name = '%2'").arg(nameDatabase,nameTable.toLower()));
         query.next();
         int n = query.value(0).toInt();
         QString column;
-        if(query.exec("SELECT * FROM "+nameTable))
+        if(query.exec(QString("SELECT * FROM %1").arg(nameTable)))
         {
             while (query.next()) {
                 for(int i = 0; i < n; i++)
@@ -108,7 +108,6 @@ bool DataBase::outputFromTable(QString nameDatabase, QString nameTable, QStringL
                         column += query.value(i).toString();
                 }
                 result->push_back(column);
-                qDebug()<<column;
                 column="";
             }
             return true;

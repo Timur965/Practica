@@ -186,7 +186,7 @@ void MainWindow::resizeEvent(QResizeEvent *)
     {
         scene->on();
     }
-    if(!ui->graphicsView->isEnabled() && clickOff)
+    if(!ui->graphicsView->isEnabled())
     {
         scene->on();
         scene->off();
@@ -208,7 +208,6 @@ void MainWindow::updateIncreaseView()
 void MainWindow::updateDecreaseView()
 {
     ui->graphicsView->setMinimumWidth(ui->graphicsView->width() - 240);
-    ui->graphicsView->setMaximumWidth(ui->graphicsView->width() + 240);
     scene->createQueue(180);
     scene->updateCoordOperations(180);
     scene->on(179);
