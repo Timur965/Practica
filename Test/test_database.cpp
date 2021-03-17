@@ -11,7 +11,7 @@ void Test_Database::connection()
 void Test_Database::createTable()
 {
     QStringList columns;
-    columns.push_back("Id SERIAL PRIMARY KEY");
+    columns.push_back("Id INTEGER PRIMARY KEY");
     columns.push_back("FirstName CHARACTER VARYING(30)");
     QCOMPARE(database.createTable("ExampleTable",columns),true);
 }

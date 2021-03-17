@@ -23,7 +23,7 @@ bool FileInOut::inputJSONFile(QVector<Operation *> operations, QString path)
             jsObj.insert("name",ops->name);
             jsObj.insert("x",ops->pos().x());
             jsObj.insert("y",ops->pos().y());
-            jsObj.insert("width",ops->width);
+            jsObj.insert("width",ops->width/ops->getCoef());
             jsObj.insert("height",ops->height);
             jsObj.insert("dynamic",ops->dynamic);
             jsObj.insert("inQueue",ops->inQueue);

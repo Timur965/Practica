@@ -22,6 +22,10 @@ MyGraphicScene::~MyGraphicScene()
         delete Off;
     if(vectorGeometry != nullptr)
         delete vectorGeometry;
+    if(dbInput != nullptr)
+        delete dbInput;
+    if(dbOutput != nullptr)
+        delete dbOutput;
 }
 QString MyGraphicScene::getCurrentName()
 {
@@ -38,6 +42,7 @@ QVector<QString> MyGraphicScene::getNamesOperations()
 }
 bool MyGraphicScene::addOperations(QString name, double x, double y, double width, double height, bool dynamic, bool inQueue)//Добавление операции на сцену
 {
+    qDebug()<<name<<x<<y<<width<<height<<dynamic<<inQueue;
     if(this->items(x,y-height,width,height,Qt::IntersectsItemShape,Qt::AscendingOrder,QTransform()).isEmpty())               //Проверяем не сталкивается ли новый объект со старыми
     {
         op = new Operation(name,x,y,width,height,dynamic,inQueue);                                                           //Инициализируем новую операцию
@@ -283,4 +288,66 @@ void MyGraphicScene::recordingInformation()
     addOperations("",0,0,40,30,true,true);
     addOperations("",0,0,10,30,true,true);
     off();
+}
+bool MyGraphicScene::inputDataDB()
+{
+    dbInput = new DataBase();
+    if(dbInput->connection("postgres","timurka01","127.0.0.1","Cyclogram"))
+    {
+        QStringList temporary;
+        int i=1;
+        foreach(Operation *ops, operations)
+        {
+            temporary.push_back(QString::number(i));
+            temporary.push_back(ops->name);
+            temporary.push_back(QString::number(ops->pos().x()));
+            temporary.push_back(QString::number(ops->pos().y()));
+            temporary.push_back(QString::number(ops->width/ops->getCoef()));
+            temporary.push_back(QString::number(ops->height));
+            temporary.push_back(QString::number(ops->dynamic));
+            temporary.push_back(QString::number(ops->inQueue));
+            if(!dbInput->insertTable("Operations",temporary))
+            {
+                break;
+                return false;
+            }
+            temporary.clear();
+            i++;
+        }
+        return true;
+    }
+    return false;
+}
+bool MyGraphicScene::outputDataDB()
+{
+    dbOutput = new DataBase();
+    QStringList data;
+    if(dbOutput->connection("postgres","timurka01","127.0.0.1","Cyclogram"))
+    {
+        if(dbOutput->outputFromTable("Cyclogram","Operations",&data))
+        {
+            QStringList line;
+            foreach(QString str, data)
+            {
+                line = str.split(',');
+                if(line.at(6) == "true")
+                {
+                    if(line.at(7) == "true")
+                        this->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),true,true);
+                    else
+                        this->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),true,false);
+                }
+                else
+                {
+                    if(line.at(7) == "true")
+                        this->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),false,true);
+                    else
+                        this->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),false,false);
+                }
+                line.clear();
+            }
+            return true;
+        }
+    }
+    return false;
 }

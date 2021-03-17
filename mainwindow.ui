@@ -80,7 +80,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_7">
+         <widget class="QPushButton" name="OnOffcyclogram">
           <property name="text">
            <string>Вкл</string>
           </property>
@@ -206,7 +206,7 @@
          <widget class="QLineEdit" name="operationHeight"/>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="AddOperation">
           <property name="text">
            <string>Добавить</string>
           </property>
@@ -289,14 +289,14 @@
          <widget class="QLineEdit" name="newOperationHeight"/>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="UpdateOperation">
           <property name="text">
            <string>Изменить</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="DeleteOperation">
           <property name="text">
            <string>Удалить</string>
           </property>
@@ -340,7 +340,7 @@
          <widget class="QComboBox" name="comboBox_3"/>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="AddQueue">
           <property name="text">
            <string>Добавить в очередь</string>
           </property>
@@ -364,16 +364,30 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_5">
+         <widget class="QPushButton" name="InputFile">
           <property name="text">
            <string>Записать в файл</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_6">
+         <widget class="QPushButton" name="OutputFile">
           <property name="text">
            <string>Считать из файла</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="InputDB">
+          <property name="text">
+           <string>Записать в БД</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="OutputDB">
+          <property name="text">
+           <string>Считать из БД</string>
           </property>
          </widget>
         </item>
