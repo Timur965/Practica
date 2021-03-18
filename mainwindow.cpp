@@ -167,23 +167,69 @@ void MainWindow::mode(QString name)
 
 void MainWindow::on_InputDB_clicked()
 {
-    if(!scene->inputDataDB())
-        QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
+    if(!ui->LoginDB->text().isEmpty())
+    {
+        if(!ui->PasswordDB->text().isEmpty())
+        {
+            QString ipRange = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+            QRegExp ipRegex ("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$");
+            if(!ui->HostDB->text().isEmpty() && ipRegex.indexIn(ui->HostDB->text()) != -1)
+            {
+                if(!ui->NameDB->text().isEmpty())
+                {
+                    if(!scene->inputDataDB(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
+                        QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
+                }
+                else
+                    QMessageBox::warning(this,"Ошибка","Введите название БД");
+            }
+            else
+                QMessageBox::warning(this,"Ошибка","Введите IP");
+        }
+        else
+            QMessageBox::warning(this,"Ошибка","Введите пароль");
+    }
+    else
+        QMessageBox::warning(this,"Ошибка","Введите логин");
 }
 
 void MainWindow::on_OutputDB_clicked()
 {
-    if(!scene->outputDataDB())
-        QMessageBox::warning(this,"Ошибка","Не удалось считать данные из БД");
-    else
+    if(!ui->LoginDB->text().isEmpty())
     {
-        foreach(QString name, scene->getNamesOperations())
+        if(!ui->PasswordDB->text().isEmpty())
         {
-            ui->comboBox->addItem(name);
-            ui->comboBox_2->addItem(name);
-            ui->comboBox_5->addItem(name);
+            QString ipRange = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+            QRegExp ipRegex ("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$");
+            if(!ui->HostDB->text().isEmpty() && ipRegex.indexIn(ui->HostDB->text()) != -1)
+            {
+                if(!ui->NameDB->text().isEmpty())
+                {
+                    if(!scene->outputDataDB(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
+                        QMessageBox::warning(this,"Ошибка","Не удалось считать данные из БД");
+                    else
+                    {
+                        ui->comboBox->clear();
+                        ui->comboBox_2->clear();
+                        foreach(QString name, scene->getNamesOperations())
+                        {
+                            ui->comboBox->addItem(name);
+                            ui->comboBox_2->addItem(name);
+                            ui->comboBox_5->addItem(name);
+                        }
+                    }
+                }
+                else
+                    QMessageBox::warning(this,"Ошибка","Введите название БД");
+            }
+            else
+                QMessageBox::warning(this,"Ошибка","Введите IP");
         }
+        else
+            QMessageBox::warning(this,"Ошибка","Введите пароль");
     }
+    else
+        QMessageBox::warning(this,"Ошибка","Введите логин");
 }
 
 void MainWindow::on_OnOffcyclogram_clicked()

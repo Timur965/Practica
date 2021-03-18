@@ -30,8 +30,8 @@ public:
     void on(int coord=59, int coordHeight = 25);
     void off(int coord=59,int coordHeight = 25);
     void recordingInformation();
-    bool inputDataDB();
-    bool outputDataDB();
+    bool inputDataDB(QString login, QString password, QString host, QString nameDB);
+    bool outputDataDB(QString login, QString password, QString host, QString nameDB);
     QString getCurrentName();
     QVector<QString> getNamesOperations();
     double width;

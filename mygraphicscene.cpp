@@ -42,7 +42,6 @@ QVector<QString> MyGraphicScene::getNamesOperations()
 }
 bool MyGraphicScene::addOperations(QString name, double x, double y, double width, double height, bool dynamic, bool inQueue)//Добавление операции на сцену
 {
-    qDebug()<<name<<x<<y<<width<<height<<dynamic<<inQueue;
     if(this->items(x,y-height,width,height,Qt::IntersectsItemShape,Qt::AscendingOrder,QTransform()).isEmpty())               //Проверяем не сталкивается ли новый объект со старыми
     {
         op = new Operation(name,x,y,width,height,dynamic,inQueue);                                                           //Инициализируем новую операцию
@@ -67,6 +66,8 @@ bool MyGraphicScene::updateOperations(int index, QString name, double x, double 
     {                                                                                                                        //Проверяем не сталкивается ли новый объект со старыми
         operations.at(index)->transformOperation(name,x,y,width,height);                                                     //Изменяем объект на сцене
         connect(operations.at(index),&Operation::changeOperation,this,&MyGraphicScene::processingChange);
+        this->createQueue();
+        this->processingRelease();
         this->update();                                                                                                      //Обновляем сцену
         return true;
     }
@@ -289,10 +290,10 @@ void MyGraphicScene::recordingInformation()
     addOperations("",0,0,10,30,true,true);
     off();
 }
-bool MyGraphicScene::inputDataDB()
+bool MyGraphicScene::inputDataDB(QString login, QString password, QString host, QString nameDB)
 {
     dbInput = new DataBase();
-    if(dbInput->connection("postgres","timurka01","127.0.0.1","Cyclogram"))
+    if(dbInput->connection(login,password,host,nameDB))
     {
         QStringList temporary;
         int i=1;
@@ -300,9 +301,17 @@ bool MyGraphicScene::inputDataDB()
         {
             temporary.push_back(QString::number(i));
             temporary.push_back(ops->name);
-            temporary.push_back(QString::number(ops->pos().x()));
-            temporary.push_back(QString::number(ops->pos().y()));
-            temporary.push_back(QString::number(ops->width/ops->getCoef()));
+            if(ops->inQueue)
+            {
+                temporary.push_back(QString::number(0));
+                temporary.push_back(QString::number(0));
+            }
+            else
+            {
+                temporary.push_back(QString::number(ops->pos().x()));
+                temporary.push_back(QString::number(ops->pos().y()));
+            }
+            temporary.push_back(QString::number(ops->width/Operation::getCoef()));
             temporary.push_back(QString::number(ops->height));
             temporary.push_back(QString::number(ops->dynamic));
             temporary.push_back(QString::number(ops->inQueue));
@@ -318,11 +327,11 @@ bool MyGraphicScene::inputDataDB()
     }
     return false;
 }
-bool MyGraphicScene::outputDataDB()
+bool MyGraphicScene::outputDataDB(QString login, QString password, QString host, QString nameDB)
 {
     dbOutput = new DataBase();
     QStringList data;
-    if(dbOutput->connection("postgres","timurka01","127.0.0.1","Cyclogram"))
+    if(dbOutput->connection(login,password,host,nameDB))
     {
         if(dbOutput->outputFromTable("Cyclogram","Operations",&data))
         {
