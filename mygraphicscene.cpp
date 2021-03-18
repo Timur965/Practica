@@ -42,7 +42,7 @@ QVector<QString> MyGraphicScene::getNamesOperations()
 }
 bool MyGraphicScene::addOperations(QString name, double x, double y, double width, double height, bool dynamic, bool inQueue)//Добавление операции на сцену
 {
-    if(this->items(x,y-height,width,height,Qt::IntersectsItemShape,Qt::AscendingOrder,QTransform()).isEmpty())               //Проверяем не сталкивается ли новый объект со старыми
+    if(this->items(x,y-height,width,height,Qt::IntersectsItemShape,Qt::AscendingOrder,QTransform()).isEmpty() || inQueue)    //Проверяем не сталкивается ли новый объект со старыми
     {
         op = new Operation(name,x,y,width,height,dynamic,inQueue);                                                           //Инициализируем новую операцию
         connect(op,&Operation::changeOperation,this,&MyGraphicScene::processingChange);
@@ -301,16 +301,8 @@ bool MyGraphicScene::inputDataDB(QString login, QString password, QString host, 
         {
             temporary.push_back(QString::number(i));
             temporary.push_back(ops->name);
-            if(ops->inQueue)
-            {
-                temporary.push_back(QString::number(0));
-                temporary.push_back(QString::number(0));
-            }
-            else
-            {
-                temporary.push_back(QString::number(ops->pos().x()));
-                temporary.push_back(QString::number(ops->pos().y()));
-            }
+            temporary.push_back(QString::number(ops->pos().x()));
+            temporary.push_back(QString::number(ops->pos().y()));
             temporary.push_back(QString::number(ops->width/Operation::getCoef()));
             temporary.push_back(QString::number(ops->height));
             temporary.push_back(QString::number(ops->dynamic));
