@@ -37,6 +37,7 @@ void SecondWindow::on_pushButton_clicked()
 {
     w = new MainWindow();
     w->show();
+    w->viewEquipment(ui->equipment->currentIndex());
     w->mode(ui->mode->currentText());
     this->close();
 }

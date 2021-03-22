@@ -3,12 +3,14 @@
 
 #include <QMainWindow>
 #include "mygraphicscene.h"
+#include "database.h"
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QRegExp>
 #include <QMessageBox>
 #include <QLabel>
 #include <QFileDialog>
+#include <QDateTime>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,9 +24,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void mode(QString name);
+    void viewEquipment(int id);
 private:
     Ui::MainWindow *ui;
     MyGraphicScene *scene=nullptr;                                          //Объявляем собственную графическую сцену
+    DataBase *db=nullptr;
+    int idEquipment;
     bool clickOn=false;
     bool clickOff=false;
     bool isMode=false;

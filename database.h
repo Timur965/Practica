@@ -4,7 +4,6 @@
 #include <QtSql>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QMap>
 
 class DataBase
 {

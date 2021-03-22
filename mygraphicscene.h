@@ -6,7 +6,6 @@
 #include "operation.h"
 #include "fileinout.h"
 #include "onoff.h"
-#include "database.h"
 #include <QLabel>
 
 class MyGraphicScene:public QGraphicsScene
@@ -30,10 +29,9 @@ public:
     void on(int coord=59, int coordHeight = 25);
     void off(int coord=59,int coordHeight = 25);
     void recordingInformation();
-    bool inputDataDB(QString login, QString password, QString host, QString nameDB);
-    bool outputDataDB(QString login, QString password, QString host, QString nameDB);
     QString getCurrentName();
     QVector<QString> getNamesOperations();
+    QVector<Operation*> getOperations();
     double width;
     double height;
 private:
@@ -45,8 +43,6 @@ private:
     QList<Operation*> listOperations;
     QVector<double> oldWidth;
     QVector<Geometry> *vectorGeometry = nullptr;
-    DataBase *dbInput = nullptr;
-    DataBase *dbOutput = nullptr;
 protected:
     virtual void drawBackground(QPainter *painter, const QRectF &rect) override;        //Метод для отрисовки заднего фона
 private slots:

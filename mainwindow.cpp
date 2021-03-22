@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     scene = new MyGraphicScene(this);                                                      //Инициализируем графическую сцену
     scene->setSceneRect(28,10,ui->graphicsView->width()-28,ui->graphicsView->height()-10); //Устанавливаем границы сцены
 
+    db = new DataBase();
+
     ui->graphicsView->setScene(scene);                                                     //Устанавливаем текущую сцену равной scene
     ui->graphicsView->setMinimumWidth(0);
     ui->graphicsView->setMaximumWidth(754);
@@ -43,6 +45,8 @@ MainWindow::~MainWindow()
     delete ui;
     if(scene != nullptr)
         delete scene;
+    if(db != nullptr)
+        delete db;
 }
 
 bool MainWindow::eventFilter(QObject *object, QEvent *event)                                //Виртуальный метод для обработки события мыши
@@ -164,33 +168,71 @@ void MainWindow::mode(QString name)
         isMode = true;
     }
 }
-
+void MainWindow::viewEquipment(int id)
+{
+    idEquipment = id;
+}
 void MainWindow::on_InputDB_clicked()
 {
     if(!ui->LoginDB->text().isEmpty())
     {
         if(!ui->PasswordDB->text().isEmpty())
         {
-            QString ipRange = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+            QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
             QRegExp ipRegex ("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$");
             if(!ui->HostDB->text().isEmpty() && ipRegex.indexIn(ui->HostDB->text()) != -1)
             {
                 if(!ui->NameDB->text().isEmpty())
                 {
-                    if(!scene->inputDataDB(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
-                        QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
+                    if(db->connection(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
+                    {
+                        if(!scene->getOperations().isEmpty())
+                        {
+                            QStringList temporary;
+                            QString nameOperations="{";
+                            QString geometryOperations="{";
+                            QString boolFlag ="{";
+                            int i=0;
+                            temporary.push_back(QString::number(idEquipment));
+                            foreach(Operation *ops, scene->getOperations())
+                            {
+                                if(i != scene->getOperations().count()-1)
+                                {
+                                    nameOperations += ops->name+",";
+                                    geometryOperations += QString::number(ops->pos().x())+","+QString::number(ops->pos().y())+","+QString::number(ops->width/Operation::getCoef())+","+QString::number(ops->height)+",";
+                                    boolFlag += QString::number(ops->dynamic)+","+QString::number(ops->inQueue)+",";
+                                }
+                                else
+                                {
+                                    nameOperations += ops->name;
+                                    geometryOperations += QString::number(ops->pos().x())+","+QString::number(ops->pos().y())+","+QString::number(ops->width/Operation::getCoef())+","+QString::number(ops->height);
+                                    boolFlag += QString::number(ops->dynamic)+","+QString::number(ops->inQueue);
+                                }
+                                i++;
+                            }
+                            nameOperations+="}";
+                            geometryOperations+="}";
+                            boolFlag +="}";
+                            temporary.push_back(QDateTime::currentDateTime().time().toString());
+                            temporary.push_back(nameOperations);
+                            temporary.push_back(geometryOperations);
+                            temporary.push_back(boolFlag);
+                            if(!db->insertTable("Operations1",temporary))
+                            {
+                                QMessageBox::warning(this,"Ошибка","Запись данных в таблицу не удалась");
+                            }
+                        }
+                        else QMessageBox::warning(this,"Ошибка","Добавьте операцию на сцену");
+                    }
+                    else QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
                 }
-                else
-                    QMessageBox::warning(this,"Ошибка","Введите название БД");
+                else QMessageBox::warning(this,"Ошибка","Введите название БД");
             }
-            else
-                QMessageBox::warning(this,"Ошибка","Введите IP");
+            else QMessageBox::warning(this,"Ошибка","Введите IP");
         }
-        else
-            QMessageBox::warning(this,"Ошибка","Введите пароль");
+        else QMessageBox::warning(this,"Ошибка","Введите пароль");
     }
-    else
-        QMessageBox::warning(this,"Ошибка","Введите логин");
+    else QMessageBox::warning(this,"Ошибка","Введите логин");
 }
 
 void MainWindow::on_OutputDB_clicked()
@@ -199,37 +241,67 @@ void MainWindow::on_OutputDB_clicked()
     {
         if(!ui->PasswordDB->text().isEmpty())
         {
-            QString ipRange = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+            QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
             QRegExp ipRegex ("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$");
             if(!ui->HostDB->text().isEmpty() && ipRegex.indexIn(ui->HostDB->text()) != -1)
             {
                 if(!ui->NameDB->text().isEmpty())
                 {
-                    if(!scene->outputDataDB(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
-                        QMessageBox::warning(this,"Ошибка","Не удалось считать данные из БД");
-                    else
+                    QStringList data;
+                    if(db->connection(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
                     {
-                        ui->comboBox->clear();
-                        ui->comboBox_2->clear();
-                        foreach(QString name, scene->getNamesOperations())
+                        if(db->outputFromTable("Cyclogram","Operations1",&data))
                         {
-                            ui->comboBox->addItem(name);
-                            ui->comboBox_2->addItem(name);
-                            ui->comboBox_5->addItem(name);
+                            QStringList line,nameOps,geometryOps,boolFlag;
+                            line = data[0].split(",{");
+                            nameOps = line.at(1).split(",");
+                            nameOps.last().truncate(nameOps.last().count()-1);
+                            geometryOps = line.at(2).split(",");
+                            geometryOps.last().truncate(geometryOps.last().count()-1);
+                            boolFlag = line.at(3).split(",");
+                            boolFlag.last().truncate(boolFlag.last().count()-1);
+                            foreach(QString str, nameOps)
+                            {
+                                if(boolFlag.at(0) == "t")
+                                {
+                                    if(boolFlag.at(1) == "t")
+                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),true,true);
+                                    else
+                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),true,false);
+                                }
+                                else
+                                {
+                                    if(boolFlag.at(1) == "t")
+                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),false,true);
+                                    else
+                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),false,false);
+                                }
+                                geometryOps.removeFirst();
+                                geometryOps.removeFirst();
+                                geometryOps.removeFirst();
+                                geometryOps.removeFirst();
+                                boolFlag.removeFirst();
+                                boolFlag.removeFirst();
+                            }
+                            ui->comboBox->clear();
+                            ui->comboBox_2->clear();
+                            foreach(QString name, scene->getNamesOperations())
+                            {
+                                ui->comboBox->addItem(name);
+                                ui->comboBox_2->addItem(name);
+                                ui->comboBox_5->addItem(name);
+                            }
                         }
                     }
+                    else QMessageBox::warning(this,"Ошибка","Не удалось считать данные из БД");
                 }
-                else
-                    QMessageBox::warning(this,"Ошибка","Введите название БД");
+                else QMessageBox::warning(this,"Ошибка","Введите название БД");
             }
-            else
-                QMessageBox::warning(this,"Ошибка","Введите IP");
+            else QMessageBox::warning(this,"Ошибка","Введите IP");
         }
-        else
-            QMessageBox::warning(this,"Ошибка","Введите пароль");
+        else QMessageBox::warning(this,"Ошибка","Введите пароль");
     }
-    else
-        QMessageBox::warning(this,"Ошибка","Введите логин");
+    else QMessageBox::warning(this,"Ошибка","Введите логин");
 }
 
 void MainWindow::on_OnOffcyclogram_clicked()
