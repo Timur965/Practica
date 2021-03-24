@@ -34,5 +34,6 @@ void Test_Database::updateTable()
 }
 void Test_Database::deleteRow()
 {
-    QCOMPARE(database.deleteRow("ExampleTable","1"),true);
+    QCOMPARE(database.deleteRow("ExampleTable","id","1","="),true);
+    database.closeConnection();
 }

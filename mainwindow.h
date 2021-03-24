@@ -33,6 +33,10 @@ private:
     bool clickOn=false;
     bool clickOff=false;
     bool isMode=false;
+    int addMoscowTimeInDB(QString nameDatabase);
+    int addRelayCommandsInDB(QString nameDatabase);
+    void addEquipmentInDB(int idMoscowTime, int idRelayCommands);
+    void addOperationsInDB(QString nameDatabase);
 protected:
     virtual bool eventFilter(QObject *object, QEvent *event) override;      // Определяем виртуальный метод для обработки события мыши
     virtual void resizeEvent(QResizeEvent *) override;
@@ -51,5 +55,6 @@ private slots:
     void on_AddQueue_clicked();
     void on_InputFile_clicked();
     void on_OutputFile_clicked();
+    void on_connectDB_clicked();
 };
 #endif // MAINWINDOW_H

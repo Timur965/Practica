@@ -14,10 +14,10 @@ public:
     bool createTable(QString nameTable, QStringList columns);
     bool insertTable(QString nameTable, QStringList value);
     bool updateTable(QString nameTable, QString nameColumn, QString Value, QString newValue);
-    bool deleteRow(QString nameTable, QString id);
+    bool deleteRow(QString nameTable, QString nameColumn, QString id, QString sign);
     bool outputFromTable(QString nameDatabase, QString nameTable, QStringList *result);
-private:
-    QSqlDatabase db;
+    void closeConnection();
+    bool isOpen=false;
 };
 
 #endif // DATABASE_H

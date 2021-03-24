@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->graphicsView->setScene(scene);                                                     //Устанавливаем текущую сцену равной scene
     ui->graphicsView->setMinimumWidth(0);
-    ui->graphicsView->setMaximumWidth(754);
+    ui->graphicsView->setMaximumWidth(925);
     ui->graphicsView->installEventFilter(this);                                            //Устанавливаем фильтр события на представление
 
     setWindowTitle("Разработка циклограммы");                                              //Устанавливаем заголовок окну
@@ -35,9 +35,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->graphicsView->setEnabled(false);
     ui->InputDB->setEnabled(false);
     ui->OutputDB->setEnabled(false);
+    ui->connectDB->setEnabled(false);
 
     ui->comboBox_4->addItem("Динамический");
     ui->comboBox_4->addItem("Статический");
+
+    ui->checkout->addItem("Вкл");
+    ui->checkout->addItem("Выкл");
+    ui->channel1->addItem("Вкл");
+    ui->channel1->addItem("Выкл");
+    ui->channel2->addItem("Вкл");
+    ui->channel2->addItem("Выкл");
 }
 
 MainWindow::~MainWindow()
@@ -172,7 +180,150 @@ void MainWindow::viewEquipment(int id)
 {
     idEquipment = id;
 }
-void MainWindow::on_InputDB_clicked()
+int MainWindow::addMoscowTimeInDB(QString nameDatabase)
+{
+    QStringList temporary;
+    if(!db->outputFromTable(nameDatabase,"MoscowTime",&temporary))
+    {
+        QMessageBox::warning(this,"Ошибка при считывании","Не удалось записать данные в таблицу MoscowTime");
+        return -1;
+    }
+    else
+    {
+        int n = 0;
+        for(int i=0; i<temporary.count();i++)
+        {
+            if(i == temporary.count()-1)
+            {
+                n = temporary.at(i).split(",").at(0).toInt()+1;
+            }
+        }
+        temporary.clear();
+        temporary.push_back(QString::number(n));
+        temporary.push_back(QString::number(QDateTime::currentDateTime().date().year()));
+        temporary.push_back(QString::number(QDateTime::currentDateTime().date().month()));
+        temporary.push_back(QString::number(QDateTime::currentDateTime().date().day()));
+        temporary.push_back(QDateTime::currentDateTime().time().toString());
+        if(!db->insertTable("MoscowTime",temporary))
+        {
+            QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу MoscowTime");
+        }
+        temporary.clear();
+        return n;
+    }
+}
+int MainWindow::addRelayCommandsInDB(QString nameDatabase)
+{
+    QStringList temporary;
+    if(!db->outputFromTable(nameDatabase,"RelayCommands",&temporary))
+    {
+        QMessageBox::warning(this,"Ошибка при считывании","Не удалось записать данные в таблицу RelayCommands");
+        return -1;
+    }
+    else
+    {
+        int n = 0;
+        for(int i=0; i<temporary.count();i++)
+        {
+            if(i == temporary.count()-1)
+            {
+                n = temporary.at(i).split(",").at(0).toInt()+1;
+            }
+        }
+        temporary.clear();
+        temporary.push_back(QString::number(n));
+        if(!clickOff)
+        {
+            if(clickOn)
+                temporary.push_back("true");
+            else
+                temporary.push_back("false");
+            temporary.push_back("false");
+        }
+        else
+        {
+            temporary.push_back("false");
+            temporary.push_back("true");
+        }
+        if(ui->checkout->currentIndex() == 0)
+           temporary.push_back("true");
+        else
+           temporary.push_back("false");
+        temporary.push_back(ui->reserveBits->text());
+        if(ui->channel1->currentIndex() == 0)
+           temporary.push_back("true");
+        else
+           temporary.push_back("false");
+        if(ui->channel2->currentIndex() == 0)
+           temporary.push_back("true");
+        else
+           temporary.push_back("false");
+        if(!db->insertTable("RelayCommands",temporary))
+        {
+            QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу RelayCommands");
+        }
+        temporary.clear();
+        return n;
+    }
+}
+void MainWindow::addEquipmentInDB(int idMoscowTime, int idRelayCommands)
+{
+    QStringList temporary;
+    temporary.push_back(QString::number(idEquipment));
+    temporary.push_back(QString::number(idMoscowTime));
+    temporary.push_back(QString::number(idRelayCommands));
+    db->deleteRow("Operations","idEquipment",QString::number(idEquipment),"=");
+    db->deleteRow("Equipment","IdEquipment",QString::number(idEquipment),"=");
+    if(!db->insertTable("Equipment",temporary))
+    {
+        QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу Equipment");
+    }
+    db->deleteRow("MoscowTime","id","(SELECT id FROM \"MoscowTime\", \"Equipment\" WHERE id = \"Equipment\".\"MoscowTime\")","!= all");
+    db->deleteRow("RelayCommands","id","(SELECT id FROM \"RelayCommands\", \"Equipment\" WHERE id = \"Equipment\".\"RelayCommands\")","!= all");
+    temporary.clear();
+}
+void MainWindow::addOperationsInDB(QString nameDatabase)
+{
+    QStringList temporary;
+    if(!db->outputFromTable(nameDatabase,"Operations",&temporary))
+    {
+        QMessageBox::warning(this,"Ошибка при считывании","Не удалось записать данные в таблицу Operations");
+    }
+    else
+    {
+        int n = 0;
+        for(int i=0; i<temporary.count();i++)
+        {
+            if(i == temporary.count()-1)
+            {
+                n = temporary.at(i).split(",").at(0).toInt()+1;
+            }
+        }
+        int i=1;
+        temporary.clear();
+        foreach(Operation *ops, scene->getOperations())
+        {
+            temporary.push_back(QString::number(n+i));
+            temporary.push_back(ops->name);
+            temporary.push_back(QString::number(ops->pos().x()));
+            temporary.push_back(QString::number(ops->pos().y()));
+            temporary.push_back(QString::number(ops->width/Operation::getCoef()));
+            temporary.push_back(QString::number(ops->height));
+            temporary.push_back(QString::number(ops->dynamic));
+            temporary.push_back(QString::number(ops->inQueue));
+            temporary.push_back(QString::number(idEquipment));
+            if(!db->insertTable("Operations",temporary))
+            {
+                QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу Operations");
+                break;
+            }
+            temporary.clear();
+            i++;
+        }
+    }
+}
+
+void MainWindow::on_connectDB_clicked()
 {
     if(!ui->LoginDB->text().isEmpty())
     {
@@ -184,47 +335,16 @@ void MainWindow::on_InputDB_clicked()
             {
                 if(!ui->NameDB->text().isEmpty())
                 {
-                    if(db->connection(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
+                    if(db->isOpen)
                     {
-                        if(!scene->getOperations().isEmpty())
-                        {
-                            QStringList temporary;
-                            QString nameOperations="{";
-                            QString geometryOperations="{";
-                            QString boolFlag ="{";
-                            int i=0;
-                            temporary.push_back(QString::number(idEquipment));
-                            foreach(Operation *ops, scene->getOperations())
-                            {
-                                if(i != scene->getOperations().count()-1)
-                                {
-                                    nameOperations += ops->name+",";
-                                    geometryOperations += QString::number(ops->pos().x())+","+QString::number(ops->pos().y())+","+QString::number(ops->width/Operation::getCoef())+","+QString::number(ops->height)+",";
-                                    boolFlag += QString::number(ops->dynamic)+","+QString::number(ops->inQueue)+",";
-                                }
-                                else
-                                {
-                                    nameOperations += ops->name;
-                                    geometryOperations += QString::number(ops->pos().x())+","+QString::number(ops->pos().y())+","+QString::number(ops->width/Operation::getCoef())+","+QString::number(ops->height);
-                                    boolFlag += QString::number(ops->dynamic)+","+QString::number(ops->inQueue);
-                                }
-                                i++;
-                            }
-                            nameOperations+="}";
-                            geometryOperations+="}";
-                            boolFlag +="}";
-                            temporary.push_back(QDateTime::currentDateTime().time().toString());
-                            temporary.push_back(nameOperations);
-                            temporary.push_back(geometryOperations);
-                            temporary.push_back(boolFlag);
-                            if(!db->insertTable("Operations1",temporary))
-                            {
-                                QMessageBox::warning(this,"Ошибка","Запись данных в таблицу не удалась");
-                            }
-                        }
-                        else QMessageBox::warning(this,"Ошибка","Добавьте операцию на сцену");
+                        db->closeConnection();
+                        ui->connectDB->setText("Подключиться к БД");
                     }
-                    else QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
+                    else
+                    {
+                        db->connection(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text());
+                        ui->connectDB->setText("Отключится от БД");
+                    }
                 }
                 else QMessageBox::warning(this,"Ошибка","Введите название БД");
             }
@@ -234,74 +354,79 @@ void MainWindow::on_InputDB_clicked()
     }
     else QMessageBox::warning(this,"Ошибка","Введите логин");
 }
+void MainWindow::on_InputDB_clicked()
+{
+    if(db->isOpen)
+    {
+        if(!scene->getOperations().isEmpty())
+        {
+            if(!ui->reserveBits->text().isEmpty())
+            {
+                QRegExp bitRegex ("^[0-1]{1,128}$");
+                if(bitRegex.indexIn(ui->reserveBits->text()) != -1)
+                {
+                    int idMoscowTime = addMoscowTimeInDB(ui->NameDB->text());
+                    if(idMoscowTime != -1)
+                    {
+                        int idRelayCommands = addRelayCommandsInDB(ui->NameDB->text());
+                        if(idRelayCommands != -1)
+                        {
+                            addEquipmentInDB(idMoscowTime,idRelayCommands);
+                            addOperationsInDB(ui->NameDB->text());
+                        }
+                    }
+                }
+                else QMessageBox::warning(this,"Ошибка","Резервные биты введены неверно");
+            }
+            else QMessageBox::warning(this,"Ошибка","Введите резервные биты");
+        }
+        else QMessageBox::warning(this,"Ошибка","Добавьте операцию на сцену");
+    }
+    else QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
+}
 
 void MainWindow::on_OutputDB_clicked()
 {
-    if(!ui->LoginDB->text().isEmpty())
+    if(db->isOpen)
     {
-        if(!ui->PasswordDB->text().isEmpty())
+        QStringList data;
+        if(db->outputFromTable("Cyclogram","Operations",&data))
         {
-            QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-            QRegExp ipRegex ("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$");
-            if(!ui->HostDB->text().isEmpty() && ipRegex.indexIn(ui->HostDB->text()) != -1)
+            QStringList line;
+            foreach(QString str, data)
             {
-                if(!ui->NameDB->text().isEmpty())
+                line = str.split(',');
+                if(line.at(8).toInt() == idEquipment)
                 {
-                    QStringList data;
-                    if(db->connection(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text()))
+                    if(line.at(6) == "true")
                     {
-                        if(db->outputFromTable("Cyclogram","Operations1",&data))
-                        {
-                            QStringList line,nameOps,geometryOps,boolFlag;
-                            line = data[0].split(",{");
-                            nameOps = line.at(1).split(",");
-                            nameOps.last().truncate(nameOps.last().count()-1);
-                            geometryOps = line.at(2).split(",");
-                            geometryOps.last().truncate(geometryOps.last().count()-1);
-                            boolFlag = line.at(3).split(",");
-                            boolFlag.last().truncate(boolFlag.last().count()-1);
-                            foreach(QString str, nameOps)
-                            {
-                                if(boolFlag.at(0) == "t")
-                                {
-                                    if(boolFlag.at(1) == "t")
-                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),true,true);
-                                    else
-                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),true,false);
-                                }
-                                else
-                                {
-                                    if(boolFlag.at(1) == "t")
-                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),false,true);
-                                    else
-                                        scene->addOperations(str,geometryOps.at(0).toDouble(),geometryOps.at(1).toDouble(),geometryOps.at(2).toDouble(),geometryOps.at(3).toDouble(),false,false);
-                                }
-                                geometryOps.removeFirst();
-                                geometryOps.removeFirst();
-                                geometryOps.removeFirst();
-                                geometryOps.removeFirst();
-                                boolFlag.removeFirst();
-                                boolFlag.removeFirst();
-                            }
-                            ui->comboBox->clear();
-                            ui->comboBox_2->clear();
-                            foreach(QString name, scene->getNamesOperations())
-                            {
-                                ui->comboBox->addItem(name);
-                                ui->comboBox_2->addItem(name);
-                                ui->comboBox_5->addItem(name);
-                            }
-                        }
+                        if(line.at(7) == "true")
+                            scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),true,true);
+                        else
+                            scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),true,false);
                     }
-                    else QMessageBox::warning(this,"Ошибка","Не удалось считать данные из БД");
+                    else
+                    {
+                        if(line.at(7) == "true")
+                            scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),false,true);
+                        else
+                            scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),false,false);
+                    }
                 }
-                else QMessageBox::warning(this,"Ошибка","Введите название БД");
+                line.clear();
             }
-            else QMessageBox::warning(this,"Ошибка","Введите IP");
+            ui->comboBox->clear();
+            ui->comboBox_2->clear();
+            foreach(QString name, scene->getNamesOperations())
+            {
+                ui->comboBox->addItem(name);
+                ui->comboBox_2->addItem(name);
+                ui->comboBox_5->addItem(name);
+            }
         }
-        else QMessageBox::warning(this,"Ошибка","Введите пароль");
+        else QMessageBox::warning(this,"Ошибка","Не удалось считать данные из БД");
     }
-    else QMessageBox::warning(this,"Ошибка","Введите логин");
+    else QMessageBox::warning(this,"Ошибка","Не удалось подключиться БД");
 }
 
 void MainWindow::on_OnOffcyclogram_clicked()
@@ -317,6 +442,7 @@ void MainWindow::on_OnOffcyclogram_clicked()
         ui->graphicsView->setEnabled(true);
         ui->InputDB->setEnabled(true);
         ui->OutputDB->setEnabled(true);
+        ui->connectDB->setEnabled(true);
         scene->on();
         clickOn = true;
         ui->OnOffcyclogram->setText("Выкл");
@@ -332,6 +458,7 @@ void MainWindow::on_OnOffcyclogram_clicked()
         ui->graphicsView->setEnabled(false);
         ui->InputDB->setEnabled(false);
         ui->OutputDB->setEnabled(false);
+        ui->connectDB->setEnabled(false);
         ui->setMinWidthOperation->hide();
         ui->setMaxWidthOperation->hide();
         ui->comboBox_5->hide();

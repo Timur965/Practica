@@ -51,7 +51,7 @@ bool MyGraphicScene::addOperations(QString name, double x, double y, double widt
         if(op->inQueue)
         {
             listOperations.push_back(op);
-            this->createQueue();
+            this->createQueue(60,60);
         }
         op->setSceneSize(this->width,this->height);
         this->addItem(op);                                                                                                   //Добавляем операцию на сцену

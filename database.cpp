@@ -6,11 +6,10 @@ DataBase::DataBase()
 }
 DataBase::~DataBase()
 {
-    db.close();
 }
 bool DataBase::connection(QString login, QString password, QString host, QString databaseName)
 {
-    db = QSqlDatabase::addDatabase("QPSQL");
+    QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     db.setHostName(host);
     db.setDatabaseName(databaseName);
     db.setUserName(login);
@@ -18,13 +17,19 @@ bool DataBase::connection(QString login, QString password, QString host, QString
     db.setPort(5432);
     if(db.open())
     {
+        isOpen = true;
         return true;
     }
     return false;
 }
+void DataBase::closeConnection()
+{
+    isOpen = false;
+    QSqlDatabase::removeDatabase("qt_sql_default_connection");
+}
 bool DataBase::createTable(QString nameTable, QStringList columns)
 {
-    if(db.isOpen())
+    if(isOpen)
     {
         QSqlQuery query;
         QString textQuery;
@@ -46,7 +51,7 @@ bool DataBase::createTable(QString nameTable, QStringList columns)
 }
 bool DataBase::insertTable(QString nameTable, QStringList value)
 {
-    if(db.isOpen())
+    if(isOpen)
     {
         QSqlQuery query;
         QString textQuery;
@@ -63,12 +68,13 @@ bool DataBase::insertTable(QString nameTable, QStringList value)
         {
             return true;
         }
+        qDebug()<<query.lastError().text();
     }
     return false;
 }
 bool DataBase::updateTable(QString nameTable, QString nameColumn, QString value, QString newValue)
 {
-    if(db.isOpen())
+    if(isOpen)
     {
         QSqlQuery query;
         if(query.exec(QString("UPDATE \"%1\" SET %2 = '%3' WHERE %4 = '%5'").arg(nameTable,nameColumn,newValue,nameColumn,value)))
@@ -78,21 +84,22 @@ bool DataBase::updateTable(QString nameTable, QString nameColumn, QString value,
     }
     return false;
 }
-bool DataBase::deleteRow(QString nameTable, QString index)
+bool DataBase::deleteRow(QString nameTable,QString nameColumn, QString index, QString sign)
 {
-    if(db.isOpen())
+    if(isOpen)
     {
         QSqlQuery query;
-        if(query.exec(QString("DELETE FROM \"%1\" WHERE id=%2").arg(nameTable,index)))
+        if(query.exec(QString("DELETE FROM \"%1\" WHERE \"%2\" %3 %4").arg(nameTable,nameColumn,sign,index)))
         {
             return true;
         }
+        qDebug()<<query.lastError().text();
     }
     return false;
 }
 bool DataBase::outputFromTable(QString nameDatabase, QString nameTable, QStringList *result)
 {
-    if(db.isOpen())
+    if(isOpen)
     {
         QSqlQuery query;
         query.exec(QString("SELECT COUNT(data_type) FROM information_schema.columns WHERE table_catalog = '%1' AND table_name = '%2'").arg(nameDatabase,nameTable));

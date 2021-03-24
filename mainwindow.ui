@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>925</width>
     <height>800</height>
    </rect>
   </property>
@@ -29,8 +29,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>776</width>
-         <height>339</height>
+         <width>901</width>
+         <height>337</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -313,8 +313,8 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
-            <height>40</height>
+            <width>143</width>
+            <height>226</height>
            </size>
           </property>
          </spacer>
@@ -425,14 +425,78 @@
        </layout>
       </item>
       <item>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="connectDB">
+          <property name="text">
+           <string>Подключится к БД</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>Включение расчековки</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="checkout"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>Отключение 1 канала</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="channel1"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_22">
+          <property name="text">
+           <string>Отключение 2 канала</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="channel2"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_23">
+          <property name="text">
+           <string>Резервные биты</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="reserveBits"/>
+        </item>
+       </layout>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>13</width>
+          <height>379</height>
          </size>
         </property>
        </spacer>
@@ -446,7 +510,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>925</width>
      <height>26</height>
     </rect>
    </property>
