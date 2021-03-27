@@ -23,38 +23,38 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void mode(QString name);
-    void viewEquipment(int id);
+    void mode(QString name);                                                //Метод для обработки выбранного режима аппаратуры
+    void viewEquipment(int id);                                             //Метод для получения вида аппаратуры
 private:
     Ui::MainWindow *ui;
     MyGraphicScene *scene=nullptr;                                          //Объявляем собственную графическую сцену
     DataBase *db=nullptr;
     int idEquipment;
-    bool clickOn=false;
-    bool clickOff=false;
+    bool clickOn=false;                                                     //Включена ли циклограмма
+    bool clickOff=false;                                                    //Выключена ли циклограмма
     bool isMode=false;
-    int addMoscowTimeInDB(QString nameDatabase);
-    int addRelayCommandsInDB(QString nameDatabase);
-    void addEquipmentInDB(int idMoscowTime, int idRelayCommands);
-    void addOperationsInDB(QString nameDatabase);
+    int addMoscowTimeInDB(QString nameDatabase);                            //Добавление в таблицу БД
+    int addRelayCommandsInDB(QString nameDatabase);                         //Добавление в таблицу БД
+    void addEquipmentInDB(int idMoscowTime, int idRelayCommands);           //Добавление в таблицу БД
+    void addOperationsInDB(QString nameDatabase);                           //Добавление в таблицу БД
 protected:
-    virtual bool eventFilter(QObject *object, QEvent *event) override;      // Определяем виртуальный метод для обработки события мыши
-    virtual void resizeEvent(QResizeEvent *) override;
+    virtual bool eventFilter(QObject *object, QEvent *event) override;      //Определяем виртуальный метод для обработки события мыши
+    virtual void resizeEvent(QResizeEvent *) override;                      //Определяем виртуальный метод для обработки события изменение окна
 private slots:
-    void updateIncreaseView();
-    void updateDecreaseView();
-    void on_comboBox_4_currentIndexChanged(int index);
-    void on_setMinWidthOperation_clicked();
-    void on_setMaxWidthOperation_clicked();
-    void on_InputDB_clicked();
-    void on_OutputDB_clicked();
-    void on_OnOffcyclogram_clicked();
-    void on_AddOperation_clicked();
-    void on_UpdateOperation_clicked();
-    void on_DeleteOperation_clicked();
-    void on_AddQueue_clicked();
-    void on_InputFile_clicked();
-    void on_OutputFile_clicked();
-    void on_connectDB_clicked();
+    void updateIncreaseView();                                              //Слот для увелечения представления
+    void updateDecreaseView();                                              //Слот для уменьшения представления
+    void on_comboBox_4_currentIndexChanged(int index);                      //Слот для выбора операции статическая или динамическая
+    void on_setMinWidthOperation_clicked();                                 //Слот для установки минимальной ширины операции
+    void on_setMaxWidthOperation_clicked();                                 //Слот для установки максимальной ширины операции
+    void on_InputDB_clicked();                                              //Слот для записи данных в БД
+    void on_OutputDB_clicked();                                             //Слот для считывания данных из БД
+    void on_OnOffcyclogram_clicked();                                       //Слот для включения или выключения циклограммы
+    void on_AddOperation_clicked();                                         //Слот для добавления операции на сцену
+    void on_UpdateOperation_clicked();                                      //Слот для обновлении операции на сцене
+    void on_DeleteOperation_clicked();                                      //Слот для удаления операции со сцены
+    void on_AddQueue_clicked();                                             //Слот для добавления операции в очередь
+    void on_InputFile_clicked();                                            //Слот для записи данных в файл
+    void on_OutputFile_clicked();                                           //Слот для считывания данных из файла
+    void on_connectDB_clicked();                                            //Слот для установки и разрыва соединения с БД
 };
 #endif // MAINWINDOW_H

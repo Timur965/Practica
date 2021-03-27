@@ -19,8 +19,8 @@ public:
     ~SecondWindow();
 
 private slots:
-    void on_pushButton_clicked();
-    void on_equipment_currentIndexChanged(const QString &arg1);
+    void on_pushButton_clicked();                                   //Слот для открытия нового окна
+    void on_equipment_currentIndexChanged(const QString &arg1);     //Слот для заполнения combobox с режимами
 
 private:
     Ui::SecondWindow *ui;

@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->comboBox_3->addItem("В середину");
     ui->comboBox_3->addItem("В конец");
 
-    connect(scene,&MyGraphicScene::increaseView,this,&MainWindow::updateIncreaseView);
-    connect(scene,&MyGraphicScene::decreaseView,this,&MainWindow::updateDecreaseView);
+    connect(scene,&MyGraphicScene::increaseView,this,&MainWindow::updateIncreaseView);     //Соединение сигнала со слотом
+    connect(scene,&MyGraphicScene::decreaseView,this,&MainWindow::updateDecreaseView);     //Соединение сигнала со слотом
 
     ui->AddOperation->setEnabled(false);
     ui->UpdateOperation->setEnabled(false);
@@ -52,9 +52,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
     if(scene != nullptr)
-        delete scene;
+        delete scene;                                                                       //Освобождение памяти из под scene
     if(db != nullptr)
-        delete db;
+        delete db;                                                                          //Освобождение памяти из под db
 }
 
 bool MainWindow::eventFilter(QObject *object, QEvent *event)                                //Виртуальный метод для обработки события мыши
@@ -90,45 +90,45 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)                    
     }
     return QObject::eventFilter(object,event);
 }
-void MainWindow::resizeEvent(QResizeEvent *)
+void MainWindow::resizeEvent(QResizeEvent *)                                                //Определяем виртуальный метод для обработки события изменение окна
 {
-    scene->createQueue();
-    if(clickOn)
+    scene->createQueue();                                                                   //Создаём очередь
+    if(clickOn)                                                                             //Если циклограмма включена
     {
-        scene->on();
+        scene->on();                                                                        //Отрисовываем начало циклограммы
     }
-    if(clickOff)
+    if(clickOff)                                                                            //Если циклограмма выключена
     {
-        scene->on();
-        scene->off();
+        scene->on();                                                                        //Отрисовываем начало циклограммы
+        scene->off();                                                                       //Отрисовываем конец циклограммы
     }
-    if(isMode && !clickOn)
+    if(isMode && !clickOn)                                                                  //Если выбран режим и циклограмма не включена
     {
-        scene->on();
-        scene->off();
+        scene->on();                                                                        //Отрисовываем начало циклограммы
+        scene->off();                                                                       //Отрисовываем конец циклограммы
     }
 }
 
-void MainWindow::updateIncreaseView()
+void MainWindow::updateIncreaseView()                                                       //Слот для увелечения представления
 {
-    ui->graphicsView->setMinimumWidth(ui->graphicsView->width() + 240);
-    scene->createQueue(60,60);
-    scene->updateCoordOperations();
-    scene->on();
+    ui->graphicsView->setMinimumWidth(ui->graphicsView->width() + 240);                     //Устанавливаем минимальный размер представления
+    scene->createQueue(60,60);                                                              //Обновляем координаты операций в очереди
+    scene->updateCoordOperations();                                                         //Обновляем координаты операций вне очереди
+    scene->on();                                                                            //Отрисовываем начало циклограммы
 }
-void MainWindow::updateDecreaseView()
+void MainWindow::updateDecreaseView()                                                       //Слот для уменьшения представления
 {
-    ui->graphicsView->setMinimumWidth(ui->graphicsView->width() - 240);
-    scene->createQueue(180);
-    scene->updateCoordOperations(180);
-    scene->on(179);
+    ui->graphicsView->setMinimumWidth(ui->graphicsView->width() - 240);                     //Устанавливаем минимальный размер представления
+    scene->createQueue(180);                                                                //Обновляем координаты операций в очереди
+    scene->updateCoordOperations(180);                                                      //Обновляем координаты операций вне очереди
+    scene->on(179);                                                                         //Отрисовываем начало циклограммы
 }
 
-void MainWindow::on_comboBox_4_currentIndexChanged(int index)
+void MainWindow::on_comboBox_4_currentIndexChanged(int index)                               //Слот для выбора операции статическая или динамическая
 {
-    if(index == 1)
+    if(index == 1)                                                                          //Если выбрана статическая операция
     {
-        if(clickOn)
+        if(clickOn)                                                                         //Если циклограмма включена
         {
             ui->setMinWidthOperation->show();
             ui->setMaxWidthOperation->show();
@@ -145,7 +145,7 @@ void MainWindow::on_comboBox_4_currentIndexChanged(int index)
     }
 }
 
-void MainWindow::on_setMinWidthOperation_clicked()
+void MainWindow::on_setMinWidthOperation_clicked()                                          //Слот для установки минимальной ширины операции
 {
     if(ui->comboBox_5->currentIndex() != -1)
     {
@@ -154,7 +154,7 @@ void MainWindow::on_setMinWidthOperation_clicked()
     }
 }
 
-void MainWindow::on_setMaxWidthOperation_clicked()
+void MainWindow::on_setMaxWidthOperation_clicked()                                          //Слот для установки максимальной ширины операции
 {
     if(ui->comboBox_5->currentIndex() != -1)
     {
@@ -162,12 +162,12 @@ void MainWindow::on_setMaxWidthOperation_clicked()
             QMessageBox::warning(this,"Неккоректная операция","Операция не статическая");
     }
 }
-void MainWindow::mode(QString name)
+void MainWindow::mode(QString name)                                                         //Метод для обработки выбранного режима аппаратуры
 {
     if(name == "Запись информации")
     {
-        scene->recordingInformation();
-        foreach(QString name, scene->getNamesOperations())
+        scene->recordingInformation();                                                      //Вызываем метод для отрисовки плана "Запись информации"
+        foreach(QString name, scene->getNamesOperations())                                  //Записываем все названия операций в combobox
         {
             ui->comboBox->addItem(name);
             ui->comboBox_2->addItem(name);
@@ -176,14 +176,14 @@ void MainWindow::mode(QString name)
         isMode = true;
     }
 }
-void MainWindow::viewEquipment(int id)
+void MainWindow::viewEquipment(int id)                                                      //Метод для получения вида аппаратуры
 {
     idEquipment = id;
 }
-int MainWindow::addMoscowTimeInDB(QString nameDatabase)
+int MainWindow::addMoscowTimeInDB(QString nameDatabase)                                     //Добавление в таблицу БД
 {
     QStringList temporary;
-    if(!db->outputFromTable(nameDatabase,"MoscowTime",&temporary))
+    if(!db->outputFromTable(nameDatabase,"MoscowTime",&temporary))                          //Если не удалось считать данные из БД
     {
         QMessageBox::warning(this,"Ошибка при считывании","Не удалось записать данные в таблицу MoscowTime");
         return -1;
@@ -195,7 +195,7 @@ int MainWindow::addMoscowTimeInDB(QString nameDatabase)
         {
             if(i == temporary.count()-1)
             {
-                n = temporary.at(i).split(",").at(0).toInt()+1;
+                n = temporary.at(i).split(",").at(0).toInt()+1;                             //Устанавливаем последний id из БД
             }
         }
         temporary.clear();
@@ -204,7 +204,7 @@ int MainWindow::addMoscowTimeInDB(QString nameDatabase)
         temporary.push_back(QString::number(QDateTime::currentDateTime().date().month()));
         temporary.push_back(QString::number(QDateTime::currentDateTime().date().day()));
         temporary.push_back(QDateTime::currentDateTime().time().toString());
-        if(!db->insertTable("MoscowTime",temporary))
+        if(!db->insertTable("MoscowTime",temporary))                                        //Если не удалось добавить данные в БД
         {
             QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу MoscowTime");
         }
@@ -212,10 +212,10 @@ int MainWindow::addMoscowTimeInDB(QString nameDatabase)
         return n;
     }
 }
-int MainWindow::addRelayCommandsInDB(QString nameDatabase)
+int MainWindow::addRelayCommandsInDB(QString nameDatabase)                                  //Добавление в таблицу БД
 {
     QStringList temporary;
-    if(!db->outputFromTable(nameDatabase,"RelayCommands",&temporary))
+    if(!db->outputFromTable(nameDatabase,"RelayCommands",&temporary))                       //Если не удалось считать данные из БД
     {
         QMessageBox::warning(this,"Ошибка при считывании","Не удалось записать данные в таблицу RelayCommands");
         return -1;
@@ -227,14 +227,14 @@ int MainWindow::addRelayCommandsInDB(QString nameDatabase)
         {
             if(i == temporary.count()-1)
             {
-                n = temporary.at(i).split(",").at(0).toInt()+1;
+                n = temporary.at(i).split(",").at(0).toInt()+1;                             //Устанавливаем последний id из БД
             }
         }
         temporary.clear();
         temporary.push_back(QString::number(n));
-        if(!clickOff)
+        if(!clickOff)                                                                       //Если циклограмма не выключена
         {
-            if(clickOn)
+            if(clickOn)                                                                     //Если циклограмма включена
                 temporary.push_back("true");
             else
                 temporary.push_back("false");
@@ -245,20 +245,20 @@ int MainWindow::addRelayCommandsInDB(QString nameDatabase)
             temporary.push_back("false");
             temporary.push_back("true");
         }
-        if(ui->checkout->currentIndex() == 0)
+        if(ui->checkout->currentIndex() == 0)                                               //Если расчековка включена
            temporary.push_back("true");
         else
            temporary.push_back("false");
         temporary.push_back(ui->reserveBits->text());
-        if(ui->channel1->currentIndex() == 0)
+        if(ui->channel1->currentIndex() == 0)                                               //Если 1 канал включен
            temporary.push_back("true");
         else
            temporary.push_back("false");
-        if(ui->channel2->currentIndex() == 0)
+        if(ui->channel2->currentIndex() == 0)                                               //Если 2 канал включен
            temporary.push_back("true");
         else
            temporary.push_back("false");
-        if(!db->insertTable("RelayCommands",temporary))
+        if(!db->insertTable("RelayCommands",temporary))                                     //Если не удалось добавить данные в БД
         {
             QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу RelayCommands");
         }
@@ -266,26 +266,28 @@ int MainWindow::addRelayCommandsInDB(QString nameDatabase)
         return n;
     }
 }
-void MainWindow::addEquipmentInDB(int idMoscowTime, int idRelayCommands)
+void MainWindow::addEquipmentInDB(int idMoscowTime, int idRelayCommands)                    //Добавление в таблицу БД
 {
     QStringList temporary;
     temporary.push_back(QString::number(idEquipment));
     temporary.push_back(QString::number(idMoscowTime));
     temporary.push_back(QString::number(idRelayCommands));
-    db->deleteRow("Operations","idEquipment",QString::number(idEquipment),"=");
-    db->deleteRow("Equipment","IdEquipment",QString::number(idEquipment),"=");
-    if(!db->insertTable("Equipment",temporary))
+    db->deleteRow("Operations","idEquipment",QString::number(idEquipment),"=");             //Удаляем предыдущии операции данного вида оборудования
+    db->deleteRow("Equipment","IdEquipment",QString::number(idEquipment),"=");              //Удаляем предыдущую аппаратуру данного
+    if(!db->insertTable("Equipment",temporary))                                             //Если не удалось добавить данные в БД
     {
         QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу Equipment");
     }
     db->deleteRow("MoscowTime","id","(SELECT id FROM \"MoscowTime\", \"Equipment\" WHERE id = \"Equipment\".\"MoscowTime\")","!= all");
+                                                                                            //Удаляем не используемое московское время
     db->deleteRow("RelayCommands","id","(SELECT id FROM \"RelayCommands\", \"Equipment\" WHERE id = \"Equipment\".\"RelayCommands\")","!= all");
+                                                                                            //Удаляем не используемые релейные команды
     temporary.clear();
 }
-void MainWindow::addOperationsInDB(QString nameDatabase)
+void MainWindow::addOperationsInDB(QString nameDatabase)                                    //Добавление в таблицу БД
 {
     QStringList temporary;
-    if(!db->outputFromTable(nameDatabase,"Operations",&temporary))
+    if(!db->outputFromTable(nameDatabase,"Operations",&temporary))                          //Если не удалось считать данные из БД
     {
         QMessageBox::warning(this,"Ошибка при считывании","Не удалось записать данные в таблицу Operations");
     }
@@ -296,7 +298,7 @@ void MainWindow::addOperationsInDB(QString nameDatabase)
         {
             if(i == temporary.count()-1)
             {
-                n = temporary.at(i).split(",").at(0).toInt()+1;
+                n = temporary.at(i).split(",").at(0).toInt()+1;                             //Устанавливаем последний id из БД
             }
         }
         int i=1;
@@ -312,7 +314,7 @@ void MainWindow::addOperationsInDB(QString nameDatabase)
             temporary.push_back(QString::number(ops->dynamic));
             temporary.push_back(QString::number(ops->inQueue));
             temporary.push_back(QString::number(idEquipment));
-            if(!db->insertTable("Operations",temporary))
+            if(!db->insertTable("Operations",temporary))                                    //Если не удалось записать данные в БД
             {
                 QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу Operations");
                 break;
@@ -323,24 +325,24 @@ void MainWindow::addOperationsInDB(QString nameDatabase)
     }
 }
 
-void MainWindow::on_connectDB_clicked()
+void MainWindow::on_connectDB_clicked()                                                     //Слот для установки и разрыва соединения с БД
 {
-    if(!ui->LoginDB->text().isEmpty())
+    if(!ui->LoginDB->text().isEmpty())                                                      //Если loginDB не пустой
     {
-        if(!ui->PasswordDB->text().isEmpty())
+        if(!ui->PasswordDB->text().isEmpty())                                               //Если passwordDB не пустой
         {
             QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
             QRegExp ipRegex ("^" + ipRange + "\\." + ipRange + "\\." + ipRange + "\\." + ipRange + "$");
-            if(!ui->HostDB->text().isEmpty() && ipRegex.indexIn(ui->HostDB->text()) != -1)
+            if(!ui->HostDB->text().isEmpty() && ipRegex.indexIn(ui->HostDB->text()) != -1)  //Если hostDB не пустой и соответствует регулярному выражению
             {
-                if(!ui->NameDB->text().isEmpty())
+                if(!ui->NameDB->text().isEmpty())                                           //Если nameDB не пустой
                 {
-                    if(db->isOpen)
+                    if(db->isOpen)                                                          //Если соединение установлено
                     {
                         db->closeConnection();
                         ui->connectDB->setText("Подключиться к БД");
                     }
-                    else
+                    else                                                                    //Если соединение не установлено
                     {
                         db->connection(ui->LoginDB->text(),ui->PasswordDB->text(),ui->HostDB->text(),ui->NameDB->text());
                         ui->connectDB->setText("Отключится от БД");
@@ -354,16 +356,16 @@ void MainWindow::on_connectDB_clicked()
     }
     else QMessageBox::warning(this,"Ошибка","Введите логин");
 }
-void MainWindow::on_InputDB_clicked()
+void MainWindow::on_InputDB_clicked()                                                       //Слот для записи данных в БД
 {
-    if(db->isOpen)
+    if(db->isOpen)                                                                          //Если соединение установлено
     {
-        if(!scene->getOperations().isEmpty())
+        if(!scene->getOperations().isEmpty())                                               //Если на сцене есть операции
         {
-            if(!ui->reserveBits->text().isEmpty())
+            if(!ui->reserveBits->text().isEmpty())                                          //Если введены резервные биты
             {
                 QRegExp bitRegex ("^[0-1]{1,128}$");
-                if(bitRegex.indexIn(ui->reserveBits->text()) != -1)
+                if(bitRegex.indexIn(ui->reserveBits->text()) != -1)                         //Если резервные биты соответствуют регулярному выражению
                 {
                     int idMoscowTime = addMoscowTimeInDB(ui->NameDB->text());
                     if(idMoscowTime != -1)
@@ -385,29 +387,29 @@ void MainWindow::on_InputDB_clicked()
     else QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
 }
 
-void MainWindow::on_OutputDB_clicked()
+void MainWindow::on_OutputDB_clicked()                                                      //Слот для считывания данных из БД
 {
-    if(db->isOpen)
+    if(db->isOpen)                                                                          //Если соединение установлено
     {
         QStringList data;
-        if(db->outputFromTable("Cyclogram","Operations",&data))
+        if(db->outputFromTable("Cyclogram","Operations",&data))                             //Если удалось считать данные из БД
         {
             QStringList line;
             foreach(QString str, data)
             {
                 line = str.split(',');
-                if(line.at(8).toInt() == idEquipment)
+                if(line.at(8).toInt() == idEquipment)                                       //Если считываемый idEquipment равен текущему idEquipment
                 {
-                    if(line.at(6) == "true")
+                    if(line.at(6) == "true")                                                //Если считываемый dynamic = true
                     {
-                        if(line.at(7) == "true")
+                        if(line.at(7) == "true")                                            //Если считываемый inQueue = true
                             scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),true,true);
                         else
                             scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),true,false);
                     }
                     else
                     {
-                        if(line.at(7) == "true")
+                        if(line.at(7) == "true")                                            //Если считываемый inQueue = true
                             scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),false,true);
                         else
                             scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),false,false);
@@ -417,7 +419,7 @@ void MainWindow::on_OutputDB_clicked()
             }
             ui->comboBox->clear();
             ui->comboBox_2->clear();
-            foreach(QString name, scene->getNamesOperations())
+            foreach(QString name, scene->getNamesOperations())                              //Добавляем все название операций в combobox
             {
                 ui->comboBox->addItem(name);
                 ui->comboBox_2->addItem(name);
@@ -429,9 +431,9 @@ void MainWindow::on_OutputDB_clicked()
     else QMessageBox::warning(this,"Ошибка","Не удалось подключиться БД");
 }
 
-void MainWindow::on_OnOffcyclogram_clicked()
+void MainWindow::on_OnOffcyclogram_clicked()                                                //Слот для включения или выключения циклограммы
 {
-    if(!clickOn)
+    if(!clickOn)                                                                            //Если циклограма не включена
     {
         ui->AddOperation->setEnabled(true);
         ui->UpdateOperation->setEnabled(true);
@@ -443,11 +445,11 @@ void MainWindow::on_OnOffcyclogram_clicked()
         ui->InputDB->setEnabled(true);
         ui->OutputDB->setEnabled(true);
         ui->connectDB->setEnabled(true);
-        scene->on();
+        scene->on();                                                                        //Отрисовываем начало циклограммы
         clickOn = true;
         ui->OnOffcyclogram->setText("Выкл");
     }
-    else
+    else                                                                                    //Если циклограма включена
     {
         ui->AddOperation->setEnabled(false);
         ui->UpdateOperation->setEnabled(false);
@@ -462,19 +464,19 @@ void MainWindow::on_OnOffcyclogram_clicked()
         ui->setMinWidthOperation->hide();
         ui->setMaxWidthOperation->hide();
         ui->comboBox_5->hide();
-        scene->off();
+        scene->off();                                                                       //Отрисовываем конец циклограммы
         clickOn = false;
         clickOff = true;
         ui->OnOffcyclogram->setText("Вкл");
     }
 }
 
-void MainWindow::on_AddOperation_clicked()
+void MainWindow::on_AddOperation_clicked()                                                  //Слот для добавления операции
 {
-    QRegExp rgx("\\d{1,3}");                                                               //Создаём регулярное выражение
+    QRegExp rgx("\\d{1,3}");                                                                //Создаём регулярное выражение
     bool dynamic=true;
     if(rgx.indexIn(ui->coordX->text()) != -1 && rgx.indexIn(ui->coordY->text()) != -1 && rgx.indexIn(ui->operationWidth->text()) != -1 && rgx.indexIn(ui->operationHeight->text()) != -1)
-    {                                                                                      //Проверка что вводятся цифры
+    {                                                                                       //Проверка что вводятся цифры
         rgx.setPattern("^[A-Z]|[a-z]\\d{1,3}$");
         if(rgx.indexIn(ui->nameOperations->text()) != -1)
         {
@@ -485,9 +487,9 @@ void MainWindow::on_AddOperation_clicked()
                ui->operationWidth->text().toDouble() >=1 &&
                ui->operationWidth->text().toDouble() <= 70 &&
                ui->operationHeight->text().toDouble() >= 30 &&
-               ui->operationHeight->text().toDouble() < 150)             //Проверка чтобы вводимые данные не выходили за границы представления
+               ui->operationHeight->text().toDouble() < 150)                                //Проверка чтобы вводимые данные не выходили за границы представления
             {
-                if(ui->comboBox_4->currentIndex() == 0)
+                if(ui->comboBox_4->currentIndex() == 0)                                     //Если выбрана динамическая операция
                 {
                     dynamic = true;
                 }
@@ -496,7 +498,7 @@ void MainWindow::on_AddOperation_clicked()
                     dynamic = false;
                 }
                 if(scene->addOperations(ui->nameOperations->text(),ui->coordX->text().toDouble(),ui->coordY->text().toDouble(),ui->operationWidth->text().toDouble(),ui->operationHeight->text().toDouble(),dynamic))
-                {
+                {                                                                           //Если удалось добавить операцию
                     ui->comboBox->addItem(scene->getCurrentName());
                     ui->comboBox_2->addItem(scene->getCurrentName());
                     ui->comboBox_5->addItem(scene->getCurrentName());
@@ -520,11 +522,11 @@ void MainWindow::on_AddOperation_clicked()
     }
 }
 
-void MainWindow::on_UpdateOperation_clicked()
+void MainWindow::on_UpdateOperation_clicked()                                               //Слот для обновления операций
 {
-    QRegExp rgx("\\d{1,3}");                                                               //Создаём регулярное выражение
+    QRegExp rgx("\\d{1,3}");                                                                //Создаём регулярное выражение
     if(rgx.indexIn(ui->newCoordX->text()) != -1 || rgx.indexIn(ui->newCoordY->text()) != -1 || rgx.indexIn(ui->newOperationWidth->text()) != -1 || rgx.indexIn(ui->newOperationHeight->text()) != -1)
-    {                                                                                      //Проверка что вводятся цифры
+    {                                                                                       //Проверка что вводятся цифры
         rgx.setPattern("^[A-Z]|[a-z]\\d{1,3}$");
         if(rgx.indexIn(ui->newNameOperations->text()) != -1)
         {
@@ -565,7 +567,7 @@ void MainWindow::on_UpdateOperation_clicked()
     }
 }
 
-void MainWindow::on_DeleteOperation_clicked()
+void MainWindow::on_DeleteOperation_clicked()                                              //Слот для удаления операций
 {
     if(ui->comboBox->count() != NULL)                                                      //Проверка если количество записей в combobox не равно 0
     {
@@ -580,36 +582,36 @@ void MainWindow::on_DeleteOperation_clicked()
     }
 }
 
-void MainWindow::on_AddQueue_clicked()
+void MainWindow::on_AddQueue_clicked()                                                      //Слот для добавления операций в очередь
 {
     scene->addList(ui->comboBox_2->currentIndex(),ui->comboBox_3->currentText());
     scene->createQueue();
 }
 
-void MainWindow::on_InputFile_clicked()
+void MainWindow::on_InputFile_clicked()                                                     //Слот для записи данных в файл
 {
-    QString path = QFileDialog::getOpenFileName(this,"Выберите файл","","*.json");
-    if(!path.isEmpty())
+    QString path = QFileDialog::getOpenFileName(this,"Выберите файл","","*.json");          //Получаем путь к файлу
+    if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
-        if(!scene->inFile(path))
+        if(!scene->inFile(path))                                                            //Если не удалось записать в файл
             QMessageBox::warning(this,"Ошибка с файлом","Данный файл невозможно открыть.");
     }
     else
         QMessageBox::warning(this,"Путь к файлу","Путь к файлу указан неверно.");
 }
 
-void MainWindow::on_OutputFile_clicked()
+void MainWindow::on_OutputFile_clicked()                                                    //Слот для считывания данных из файла
 {
-    QString path = QFileDialog::getOpenFileName(this,"Выберите файл","","*.json");
-    if(!path.isEmpty())
+    QString path = QFileDialog::getOpenFileName(this,"Выберите файл","","*.json");          //Получаем путь к файлу
+    if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
-        if(!scene->outFile(path))
+        if(!scene->outFile(path))                                                           //Если не удалось считать из файла
             QMessageBox::warning(this,"Ошибка с файлом","Данный файл невозможно открыть.");
         else
         {
             ui->comboBox->clear();
             ui->comboBox_2->clear();
-            foreach(QString name, scene->getNamesOperations())
+            foreach(QString name, scene->getNamesOperations())                              //Заполняем combobox
             {
                 ui->comboBox->addItem(name);
                 ui->comboBox_2->addItem(name);

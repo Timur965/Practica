@@ -5,13 +5,13 @@
 
 struct Geometry
 {
-    QString name;
-    double x;
-    double y;
-    double width;
-    double height;
-    bool inQueue;
-    bool dynamic;
+    QString name;           //Название операции
+    double x;               //Координата х операции
+    double y;               //Координата у операции
+    double width;           //Ширина операции
+    double height;          //Высота операции
+    bool inQueue;           //В очереди операция
+    bool dynamic;           //Динамическая операция
 };
 
 #endif // STRUCTURES_H

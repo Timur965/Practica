@@ -9,25 +9,25 @@ MyGraphicScene::MyGraphicScene(QObject *parent) : QGraphicsScene(parent)
 MyGraphicScene::~MyGraphicScene()
 {
     if(op != nullptr)
-        delete op;
+        delete op;                                                                                                            //Освобождение памяти из под op
     operations.clear();
-    qDeleteAll(operations);
+    qDeleteAll(operations);                                                                                                   //Освобождение памяти из под operations
     listOperations.clear();
-    qDeleteAll(listOperations);
+    qDeleteAll(listOperations);                                                                                               //Освобождение памяти из под listOperations
     if(fileInOut != nullptr)
-        delete fileInOut;
+        delete fileInOut;                                                                                                     //Освобождение памяти из под fileInOut
     if(On != nullptr)
-        delete On;
+        delete On;                                                                                                            //Освобождение памяти из под on
     if(Off != nullptr)
-        delete Off;
+        delete Off;                                                                                                           //Освобождение памяти из под off
     if(vectorGeometry != nullptr)
-        delete vectorGeometry;
+        delete vectorGeometry;                                                                                                //Освобождение памяти из под vectorGeometry
 }
-QString MyGraphicScene::getCurrentName()
+QString MyGraphicScene::getCurrentName()                                                                                      //Метод для получения названия операции
 {
     return op->name;
 }
-QVector<QString> MyGraphicScene::getNamesOperations()
+QVector<QString> MyGraphicScene::getNamesOperations()                                                                         //Метод для получения всех названий операций
 {
     QVector<QString> temporaryVector;
     foreach(Operation* ops,operations)
@@ -36,7 +36,7 @@ QVector<QString> MyGraphicScene::getNamesOperations()
     }
     return temporaryVector;
 }
-QVector<Operation*> MyGraphicScene::getOperations()
+QVector<Operation*> MyGraphicScene::getOperations()                                                                          //Метод для получения всех операций
 {
     return operations;
 }
@@ -92,7 +92,7 @@ void MyGraphicScene::drawBackground(QPainter *painter, const QRectF &rect)      
         painter->drawLine(i,height/2-45,i,height/2-25);
     }
     int x=0;
-    for(int i=-width/2+59;i<(width/2+60);i=i+60)                                                                               //Рисуем значения
+    for(int i=-width/2+59;i<(width/2+60);i=i+60)                                                                             //Рисуем значения
     {
         if(i<=width/2+59)
             painter->drawText(i,height/2-15,QString::number(x));
@@ -101,49 +101,49 @@ void MyGraphicScene::drawBackground(QPainter *painter, const QRectF &rect)      
         x +=60/Operation::getCoef();
     }
     painter->drawLine(width/2+40,height/2-50,width/2+57,height/2-35);                                                        //Рисуем верхнюю стороны стрелки
-    painter->drawLine(width/2+40,height/2-20,width/2+57,height/2-35);                                                           //Рисуем нижнюю стороны стрелки
+    painter->drawLine(width/2+40,height/2-20,width/2+57,height/2-35);                                                        //Рисуем нижнюю стороны стрелки
 }
-void MyGraphicScene::updateCoordOperations(int coord)
+void MyGraphicScene::updateCoordOperations(int coord)                                                                        //Метод для обовления координат операций не добавленных в очередь
 {
     if(operations.count() != 0)
     {
         foreach(Operation *ops, operations)
         {
-            ops->setSceneSize(this->width,this->height);
-            ops->setCoordStart(coord);
+            ops->setSceneSize(this->width,this->height);                                                                     //Передаём новые размеры сцены
+            ops->setCoordStart(coord);                                                                                       //Передаём новое начало сцены
             this->update();
         }
     }
 }
-void MyGraphicScene::createQueue(int coord, int coordHeight)
+void MyGraphicScene::createQueue(int coord, int coordHeight)                                                                 //Метод для построения очереди
 {
     if(listOperations.count() != 0)
     {
-        double x = -width/2+coord;
-        double y = height/2-coordHeight;
+        double x = -width/2+coord;                                                                                           //Начало координат по х
+        double y = height/2-coordHeight;                                                                                     //Начало координат по у
         foreach(Operation *ops, listOperations)
         {
-            if(x+ops->width <= width/2+coord)
+            if(x+ops->width <= width/2+coord)                                                                                //Если операция не вышла за границу сцены
             {
                 ops->setPos(x,y);
                 x=x+ops->width;
             }
             else
             {
-                oldWidth.push_back(width/2+coord);
-                emit increaseView();
+                oldWidth.push_back(width/2+coord);                                                                           //Записываем текущую ширину сцены
+                emit increaseView();                                                                                         //Вызываем сигнал
             }
             ops->inQueue = true;
-            ops->setSceneSize(this->width,this->height);
-            ops->setCoordStart(coord);
+            ops->setSceneSize(this->width,this->height);                                                                     //Передаём новые размеры сцены
+            ops->setCoordStart(coord);                                                                                       //Передаём новое начало сцены
             this->update();
         }
     }
 }
-void MyGraphicScene::processingChange()
+void MyGraphicScene::processingChange()                                                                                      //Слот для обработки  операции при изменении ширины
 {
     Operation *focusOperation;
-    focusOperation = static_cast<Operation*>(this->focusItem());
+    focusOperation = static_cast<Operation*>(this->focusItem());                                                             //Преобразуем QGraphicsItem* к Operation*
     foreach(Operation *ops, operations)
     {
         if(focusOperation == ops && ops->inQueue)
@@ -153,25 +153,25 @@ void MyGraphicScene::processingChange()
         }
     }
 }
-void MyGraphicScene::processingRelease()
+void MyGraphicScene::processingRelease()                                                                                     //Слот для обработки  операции после изменения ширины
 {
-    double x = -width/2+59;
+    double x = -width/2+59;                                                                                                  //Начало координат по х
     foreach(Operation *ops, listOperations)
     {
         x = x+ops->width;
     }
-    if(!oldWidth.isEmpty() && x < oldWidth.back()-120)
+    if(!oldWidth.isEmpty() && x < oldWidth.back()-120)                                                                       //Если oldWidth не пустой и ширина всех операций меньше предыдущей ширины
     {
         oldWidth.pop_back();
         emit decreaseView();
     }
 }
-void MyGraphicScene::addList(int index, QString whereToAdd)
+void MyGraphicScene::addList(int index, QString whereToAdd)                                                                  //Метод для добавления операций в очередь
 {
     if(!operations.empty())
     {
-        int find = listOperations.indexOf(operations.at(index));
-        if(find != -1)
+        int find = listOperations.indexOf(operations.at(index));                                                             //Получаем индекс операции добавляемой в очередь
+        if(find != -1)                                                                                                       //Если этот элемент добавлен в очередь
         {
             if(whereToAdd == "В начало")
                 listOperations.swapItemsAt(find,0);
@@ -191,30 +191,30 @@ void MyGraphicScene::addList(int index, QString whereToAdd)
         }
     }
 }
-bool MyGraphicScene::inFile(QString path)
+bool MyGraphicScene::inFile(QString path)                                                                                    //Метод для записи в файл
 {
-    if(!operations.empty() && fileInOut->inputJSONFile(operations,path))
+    if(!operations.empty() && fileInOut->inputJSONFile(operations,path))                                                     //Если operations не пустой и добавлено в файл
     {
         return true;
     }
     return false;
 }
-bool MyGraphicScene::outFile(QString path)
+bool MyGraphicScene::outFile(QString path)                                                                                   //Метод для считывания из файла
 {
     vectorGeometry = new QVector<Geometry>();
-    fileInOut->outputJSONFile(path,vectorGeometry);
+    fileInOut->outputJSONFile(path,vectorGeometry);                                                                          //Считываем данные из файла
     if(!vectorGeometry->empty())
     {
         foreach(Geometry geom, *vectorGeometry)
         {
-            this->addOperations(geom.name,geom.x,geom.y,geom.width,geom.height,geom.dynamic,geom.inQueue);
+            this->addOperations(geom.name,geom.x,geom.y,geom.width,geom.height,geom.dynamic,geom.inQueue);                   //Добавляем на сцену
         }
         listOperations.clear();
         foreach(Operation *ops, operations)
         {
             if(ops->inQueue)
             {
-                listOperations.push_back(ops);
+                listOperations.push_back(ops);                                                                               //Добавляем в очередь
             }
         }
         this->createQueue();
@@ -222,22 +222,22 @@ bool MyGraphicScene::outFile(QString path)
     }
     return false;
 }
-void MyGraphicScene::on(int coord, int coordHeight)
+void MyGraphicScene::on(int coord, int coordHeight)                                                                          //Метод для отрисовки начала циклограммы
 {
     if(On !=nullptr)
     {
-        this->removeItem(On);
+        this->removeItem(On);                                                                                                //Удаляем элемент со сцены
         delete On;
     }
     if(Off !=nullptr)
     {
-        this->removeItem(Off);
+        this->removeItem(Off);                                                                                               //Удаляем элемент со сцены
         delete Off;
         Off=nullptr;
     }
     On = new onOff();
-    On->x = -width/2+coord;
-    On->y = height/2-coordHeight;
+    On->x = -width/2+coord;                                                                                                  //Устанавливаем начало координат по х
+    On->y = height/2-coordHeight;                                                                                            //Устанавливаем начало координат по у
     On->width = 1;
     On->height = 50;
     On->name = "Т0";
@@ -252,41 +252,41 @@ void MyGraphicScene::off(int coord, int coordHeight)
     {
         x = x+ops->width;
     }
-    Off->x = x;
-    Off->y = height/2-coordHeight;
+    Off->x = x;                                                                                                              //Устанавливаем начало координат по х
+    Off->y = height/2-coordHeight;                                                                                           //Устанавливаем начало координат по у
     Off->width = 1;
     Off->height = 50;
     Off->name = "Тк";
     this->addItem(Off);
     this->update();
 }
-bool MyGraphicScene::setMinWidthOperation(int index)
+bool MyGraphicScene::setMinWidthOperation(int index)                                                                         //Метод для установки минимальной ширины операции
 {
-    if(operations.at(index)->setMinWidth())
+    if(operations.at(index)->setMinWidth())                                                                                  //Если удалось изменить ширину
     {
         this->update();
         return true;
     }
     return false;
 }
-bool MyGraphicScene::setMaxWidthOperation(int index)
+bool MyGraphicScene::setMaxWidthOperation(int index)                                                                         //Метод для установки минимальной ширины операции
 {
-    if(operations.at(index)->setMaxWidth())
+    if(operations.at(index)->setMaxWidth())                                                                                  //Если удалось изменить ширину
     {
         this->update();
         return true;
     }
     return false;
 }
-void MyGraphicScene::recordingInformation()
+void MyGraphicScene::recordingInformation()                                                                                  //Метод для отрисовки плана "Запись информации"
 {
-    on();
-    addOperations("",0,0,60,30,true,true);
-    addOperations("",0,0,10,30,true,true);
-    addOperations("",0,0,30,30,true,true);
-    addOperations("",0,0,30,30,true,true);
-    addOperations("",0,0,30,30,true,true);
-    addOperations("",0,0,40,30,true,true);
-    addOperations("",0,0,10,30,true,true);
-    off();
+    on();                                                                                                                    //Отрисовываем начало циклограммы
+    addOperations("",0,0,60,30,true,true);                                                                                   //Добавляем операцию
+    addOperations("",0,0,10,30,true,true);                                                                                   //Добавляем операцию
+    addOperations("",0,0,30,30,true,true);                                                                                   //Добавляем операцию
+    addOperations("",0,0,30,30,true,true);                                                                                   //Добавляем операцию
+    addOperations("",0,0,30,30,true,true);                                                                                   //Добавляем операцию
+    addOperations("",0,0,40,30,true,true);                                                                                   //Добавляем операцию
+    addOperations("",0,0,10,30,true,true);                                                                                   //Добавляем операцию
+    off();                                                                                                                   //Отрисовываем конец циклограммы
 }
