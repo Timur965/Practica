@@ -265,7 +265,7 @@ void MainWindow::deleteOperation(int index)
 }
 void MainWindow::on_InputFile_clicked()                                                     //Слот для записи данных в файл
 {
-    QString path = QFileDialog::getSaveFileName(this,"Выберите файл",QString("Сеанс √%1 %2 %3").arg(ui->number->currentText(),ui->mode->currentText(),QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),"*.json");
+    QString path = QFileDialog::getSaveFileName(this,"Выберите файл",QString("Сеанс √%1 %2 %3").arg(ui->number->currentText(),ui->mode->currentText(),QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
                                                                                             //Получаем путь к файлу
     if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
@@ -290,7 +290,7 @@ void MainWindow::on_InputFile_clicked()                                         
 
 bool MainWindow::on_OutputFile_clicked()                                                    //Слот для считывания данных из файла
 {
-    QString path = QFileDialog::getOpenFileName(this,"Выберите файл","","*.json");          //Получаем путь к файлу
+    QString path = QFileDialog::getOpenFileName(this,"Выберите файл","",tr("*.json"));      //Получаем путь к файлу
     if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
         vectorGeometry = new QVector<Geometry>();

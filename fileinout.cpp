@@ -32,6 +32,7 @@ bool FileInOut::inputJSONFile(QVector<Operation *> operations, QString path)    
         jsObj1.insert("Operations",jsArray);
         doc = QJsonDocument(jsObj1);                                                            //Создаем QJsonDocument из объекта
         jsStr = doc.toJson(QJsonDocument::Compact);                                             //Преобразуем QJsonDocument в документ JSON в кодировке UTF-8 и определяем формат
+        stream.setCodec("UTF-8");
         stream<<jsStr;                                                                          //Записываем в stream
         file1.close();
         return true;

@@ -18,6 +18,7 @@ Action::~Action()
 void Action::completionCombobox(QVector<QString> data)
 {
     ui->comboBox->clear();
+    ui->comboBox_2->clear();
     foreach(QString name, data)                                                             //Заполняем combobox
     {
         ui->comboBox->addItem(name);
@@ -111,9 +112,9 @@ void Action::on_DeleteOperation_clicked()
     if(ui->comboBox_2->count() != NULL)                                                       //Проверка если количество записей в combobox не равно 0
     {
         int index = ui->comboBox_2->currentIndex();
+        emit signalDeleteOperation(ui->comboBox_2->currentIndex());
         ui->comboBox->removeItem(index);
         ui->comboBox_2->removeItem(index);
-        emit signalDeleteOperation(ui->comboBox_2->currentIndex());
     }
     else
     {
