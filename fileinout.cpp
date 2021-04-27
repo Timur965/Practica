@@ -26,7 +26,6 @@ bool FileInOut::inputJSONFile(QVector<Operation *> operations, QString path)    
             jsObj.insert("width",ops->width/Operation::getCoef());                              //Вставляем элемент с ключом width
             jsObj.insert("interval",ops->interval/Operation::getCoef());                        //Вставляем элемент с ключом height
             jsObj.insert("dynamic",ops->dynamic);                                               //Вставляем элемент с ключом dynamic
-            jsObj.insert("inQueue",ops->inQueue);                                               //Вставляем элемент с ключом inQueue
 
             jsArray.push_back(jsObj);
         }
@@ -61,7 +60,6 @@ bool FileInOut::outputJSONFile(QString path, QVector<Geometry> *vectorGeom)     
             geom.width = js["width"].toDouble();
             geom.interval = js["interval"].toDouble();
             geom.dynamic = js["dynamic"].toBool();
-            geom.inQueue = js["inQueue"].toBool();
             vectorGeom->push_back(geom);
         }
         file1.close();

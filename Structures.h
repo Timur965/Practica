@@ -10,7 +10,6 @@ struct Geometry
     double y;               //Координата у операции
     double width;           //Ширина операции
     double interval;        //Высота операции
-    bool inQueue;           //В очереди операция
     bool dynamic;           //Динамическая операция
 };
 

@@ -10,29 +10,27 @@ CONFIG += c++11
 
 SOURCES += \
     Test/test_database.cpp \
+    action.cpp \
     database.cpp \
     fileinout.cpp \
     main.cpp \
     mainwindow.cpp \
     mygraphicscene.cpp \
-    operation.cpp \
-    resizeoperation.cpp \
-    secondwindow.cpp
+    operation.cpp
 
 HEADERS += \
     Structures.h \
     Test/test_database.h \
+    action.h \
     database.h \
     fileinout.h \
     mainwindow.h \
     mygraphicscene.h \
-    operation.h \
-    resizeoperation.h \
-    secondwindow.h
+    operation.h
 
 FORMS += \
-    mainwindow.ui \
-    secondwindow.ui
+    action.ui \
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -46,6 +46,7 @@ bool DataBase::insertTable(QString nameTable, QStringList value)                
         {
             return true;
         }
+        qDebug()<<query.lastError().text();
     }
     return false;
 }

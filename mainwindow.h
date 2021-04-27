@@ -5,6 +5,7 @@
 #include "mygraphicscene.h"
 #include "database.h"
 #include "fileinout.h"
+#include "action.h"
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QRegExp>
@@ -24,17 +25,16 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void mode(QString name);                                                //Метод для обработки выбранного режима аппаратуры
-    void onTime(QString dateTime);                                          //Метод для получения вида аппаратуры
 private:
     Ui::MainWindow *ui;
     MyGraphicScene *scene=nullptr;                                          //Объявляем собственную графическую сцену
     DataBase *db=nullptr;
     FileInOut *fileInOut = nullptr;                                         //Указатель класса fileInOut
-    QString dateTime;
+    Action *window = nullptr;
     QString nameMode;
     void addOperationsInDB(QString nameDatabase);                           //Добавление в таблицу БД
     QVector<Geometry> *vectorGeometry = nullptr;                            //Данные операций из файла
+    void selectingAction(QString nameAction);
 protected:
     virtual bool eventFilter(QObject *object, QEvent *event) override;      //Определяем виртуальный метод для обработки события мыши
     virtual void resizeEvent(QResizeEvent *) override;                      //Определяем виртуальный метод для обработки события изменение окна
@@ -47,10 +47,15 @@ private slots:
     void on_AddOperation_clicked();                                         //Слот для добавления операции на сцену
     void on_UpdateOperation_clicked();                                      //Слот для обновлении операции на сцене
     void on_DeleteOperation_clicked();                                      //Слот для удаления операции со сцены
-    void on_AddQueue_clicked();                                             //Слот для добавления операции в очередь
     void on_InputFile_clicked();                                            //Слот для записи данных в файл
-    void on_OutputFile_clicked();                                           //Слот для считывания данных из файла
+    bool on_OutputFile_clicked();                                           //Слот для считывания данных из файла
     void on_connectDB_clicked();                                            //Слот для установки и разрыва соединения с БД
-    void on_comboBox_4_currentIndexChanged(int index);
+    void on_createCyclogram_triggered();
+    void on_updateCyclogram_triggered();
+    void on_showCyclogram_triggered();
+public slots:
+    void addOperation(QString name, double widthOperation, double intervalOperations, bool dynamic);
+    void updateOperation(int index, QString name, double widthOperation, double intervalOperations);
+    void deleteOperation(int index);
 };
 #endif // MAINWINDOW_H

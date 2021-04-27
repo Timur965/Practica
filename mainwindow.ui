@@ -84,90 +84,6 @@
        </spacer>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Выберите тип операции</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_4"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Название операции</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="nameOperations"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Координата Х</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="coordX"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Координата Y</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="coordY"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Продолжительность</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="operationWidth"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Интервал</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="operationInterval"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="AddOperation">
-          <property name="text">
-           <string>Добавить</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <spacer name="verticalSpacer_6">
@@ -183,17 +99,26 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="label_4">
+         <widget class="QPushButton" name="AddOperation">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>50</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Выберите операцию</string>
+           <string>Добавить</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox"/>
-        </item>
-        <item>
          <widget class="QPushButton" name="UpdateOperation">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>50</height>
+           </size>
+          </property>
           <property name="text">
            <string>Изменить</string>
           </property>
@@ -201,45 +126,18 @@
         </item>
         <item>
          <widget class="QPushButton" name="DeleteOperation">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>50</height>
+           </size>
+          </property>
           <property name="text">
            <string>Удалить</string>
           </property>
          </widget>
         </item>
-        <item>
-         <spacer name="verticalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>Выберите куда добавить</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_3"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="AddQueue">
-          <property name="text">
-           <string>Добавить в очередь</string>
-          </property>
-         </widget>
-        </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_4"/>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -255,6 +153,12 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QComboBox" name="number"/>
+        </item>
+        <item>
+         <widget class="QComboBox" name="mode"/>
         </item>
         <item>
          <widget class="QPushButton" name="InputFile">
@@ -393,8 +297,32 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Режимы</string>
+    </property>
+    <addaction name="createCyclogram"/>
+    <addaction name="updateCyclogram"/>
+    <addaction name="showCyclogram"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="createCyclogram">
+   <property name="text">
+    <string>Формирование циклограммы</string>
+   </property>
+  </action>
+  <action name="updateCyclogram">
+   <property name="text">
+    <string>Редактирование циклограммы</string>
+   </property>
+  </action>
+  <action name="showCyclogram">
+   <property name="text">
+    <string>Отображение циклограммы</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
