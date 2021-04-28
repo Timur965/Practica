@@ -80,9 +80,9 @@ void Action::on_AddOperation_clicked()
         if(ui->operationWidth->text().toDouble() >=1 &&
            ui->operationWidth->text().toDouble() <= 360 &&
            ui->operationInterval->text().toDouble() >= 0 &&
-           ui->operationInterval->text().toDouble() < 360)                              //Проверка чтобы вводимые данные не выходили за границы представления
+           ui->operationInterval->text().toDouble() < 360)                                  //Проверка чтобы вводимые данные не выходили за границы представления
         {
-            if(ui->comboBox_4->currentIndex() == 0)                                     //Если выбрана динамическая операция
+            if(ui->comboBox_4->currentIndex() == 0)                                         //Если выбрана динамическая операция
             {
                 dynamic = true;
             }

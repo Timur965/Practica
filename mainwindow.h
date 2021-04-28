@@ -31,7 +31,6 @@ private:
     DataBase *db=nullptr;
     FileInOut *fileInOut = nullptr;                                         //Указатель класса fileInOut
     Action *window = nullptr;
-    QString nameMode;
     bool addOperationsInDB(QString nameDatabase);                           //Добавление в таблицу БД
     QVector<Geometry> *vectorGeometry = nullptr;                            //Данные операций из файла
     void selectingAction(QString nameAction);

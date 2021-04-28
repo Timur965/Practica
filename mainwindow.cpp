@@ -109,7 +109,6 @@ bool MainWindow::addOperationsInDB(QString nameDatabase)                        
             temporary.push_back(QString::number(ops->width/Operation::getCoef()));
             temporary.push_back(QString::number(ops->interval/Operation::getCoef()));
             temporary.push_back(QString::number(ops->dynamic));
-            temporary.push_back(nameMode);
             temporary.push_back(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
             if(!db->insertTable("Operations",temporary))                                    //Если не удалось записать данные в БД
             {
@@ -157,8 +156,8 @@ void MainWindow::on_connectDB_clicked()                                         
                                foreach(QString str, data)
                                {
                                    line = str.split(',');
-                                   if(ui->DateTimeOutBD->findText(line.at(7)) == -1)
-                                        ui->DateTimeOutBD->addItem(line.at(7));
+                                   if(ui->DateTimeOutBD->findText(line.at(6)) == -1)
+                                        ui->DateTimeOutBD->addItem(line.at(6));
                                }
                             }
                             ui->connectDB->setText("Отключиться от БД");
@@ -198,7 +197,7 @@ void MainWindow::on_OutputDB_clicked()                                          
             foreach(QString str, data)
             {
                 line = str.split(',');
-                if(line.at(7) == ui->DateTimeOutBD->currentText())                          //Если считываемая дата равна выбранной и режим равен выбранному
+                if(line.at(6) == ui->DateTimeOutBD->currentText())                          //Если считываемая дата равна выбранной и режим равен выбранному
                 {
                     if(line.at(5) == "true")                                                //Если считываемый dynamic = true
                     {
