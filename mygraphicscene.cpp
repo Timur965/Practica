@@ -37,15 +37,27 @@ void MyGraphicScene::allClear()
     operations.clear();
     op = nullptr;
 }
-bool MyGraphicScene::addOperations(QString name, double x, double y, double width, double interval, bool dynamic)            //Добавление операции на сцену
+bool MyGraphicScene::checkName(QString name)
 {
-    if(this->items(x,y-40,width,40,Qt::IntersectsItemShape,Qt::AscendingOrder,QTransform()).isEmpty())                       //Проверяем не сталкивается ли новый объект со старыми
+    bool oldName=false;
+    foreach(Operation *ops, operations)
     {
-        op = new Operation(name,x,y,width,interval,dynamic);                                                                 //Инициализируем новую операцию
+        if(name == ops->name)
+        {
+            oldName = true;
+            break;
+        }
+    }
+    return oldName;
+}
+bool MyGraphicScene::addOperations(QString name, QString reduction, double width, double interval, bool dynamic)             //Добавление операции на сцену
+{
+    if(!checkName(name))                                                                                                     //Проверяем не занято ли имя
+    {
+        op = new Operation(name,reduction,width,interval,dynamic);                                                           //Инициализируем новую операцию
         connect(op,&Operation::changeOperation,this,&MyGraphicScene::processingChange);
-        connect(op,&Operation::releaseResizeOperation,this,&MyGraphicScene::processingRelease);
         operations.push_back(op);                                                                                            //Добавляем указатель на операцию в вектор
-        this->createQueue(59);
+        this->createQueue();
         op->setSceneSize(this->width,this->height);
         this->addItem(op);                                                                                                   //Добавляем операцию на сцену
         this->update();                                                                                                      //Обновляем сцену
@@ -53,11 +65,11 @@ bool MyGraphicScene::addOperations(QString name, double x, double y, double widt
     }
     return false;
 }
-bool MyGraphicScene::updateOperations(int index, QString name, double x, double y, double width, double interval)
-{                                                                                                                            //Изменение операции на сцене
-    if(this->items(x,y-40,width,40,Qt::IntersectsItemShape,Qt::AscendingOrder,QTransform()).isEmpty() || operations.at(index)->pos() == QPointF(x,y))
-    {                                                                                                                        //Проверяем не сталкивается ли новый объект со старыми
-        operations.at(index)->transformOperation(name,x,y,width,interval);                                                   //Изменяем объект на сцене
+bool MyGraphicScene::updateOperations(int index, QString name, QString reduction, double width, double interval)             //Изменение операции на сцене
+{
+    if(!checkName(name) || operations.at(index)->name == name)                                                               //Проверяем не занято ли имя
+    {
+        operations.at(index)->transformOperation(name,reduction,width,interval);                                             //Изменяем объект на сцене
         connect(operations.at(index),&Operation::changeOperation,this,&MyGraphicScene::processingChange);
         this->createQueue();
         this->processingRelease();
@@ -117,10 +129,13 @@ void MyGraphicScene::createQueue(int coord, int coordHeight)                    
         double y = height/2-coordHeight;                                                                                     //Начало координат по у
         foreach(Operation *ops, operations)
         {
-            if(x+ops->width <= width/2+coord)                                                                                //Если операция не вышла за границу сцены
+            if(x + ops->width + ops->interval <= width/2+coord)                                                              //Если операция не вышла за границу сцены
             {
                 ops->setPos(x,y);
-                x=x+ops->width + ops->interval;
+                if(ops->dynamic)
+                    x = x + ops->width + ops->interval;
+                else
+                    x = x + ops->width + ops->interval - 1;
             }
             else
             {

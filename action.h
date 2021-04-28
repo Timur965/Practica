@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QMessageBox>
+#include "fileinout.h"
+#include <QDir>
 
 namespace Ui {
 class Action;
@@ -20,15 +22,19 @@ public:
 
 private:
     Ui::Action *ui;
+    FileInOut *file = nullptr;
+    QStringList *namesOperations = nullptr;
+    QStringList *reductionOperations = nullptr;
 
 signals:
-    void signalAddOperation(QString name, double widthOperation, double intervalOperations, bool dynamic);
-    void signalUpdateOperation(int index, QString name, double widthOperation, double intervalOperations);
+    void signalAddOperation(QString name, QString reduction, double widthOperation, double intervalOperations, bool dynamic);
+    void signalUpdateOperation(int index, QString name, QString reduction, double widthOperation, double intervalOperations);
     void signalDeleteOperation(int index);
 private slots:
     void on_AddOperation_clicked();
     void on_UpdateOperation_clicked();
     void on_DeleteOperation_clicked();
+    void on_comboBox_4_currentIndexChanged(int index);
 };
 
 #endif // ACTION_H

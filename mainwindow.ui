@@ -155,7 +155,21 @@
          </spacer>
         </item>
         <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Номер сеанса</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QComboBox" name="number"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Режим</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QComboBox" name="mode"/>
@@ -164,13 +178,6 @@
          <widget class="QPushButton" name="InputFile">
           <property name="text">
            <string>Записать в файл</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="OutputFile">
-          <property name="text">
-           <string>Считать из файла</string>
           </property>
          </widget>
         </item>

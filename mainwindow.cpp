@@ -27,7 +27,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->UpdateOperation->setEnabled(false);
     ui->DeleteOperation->setEnabled(false);
     ui->InputFile->setEnabled(false);
-    ui->OutputFile->setEnabled(false);
     ui->connectDB->setEnabled(false);
     ui->InputDB->setEnabled(false);
     ui->OutputDB->setEnabled(false);
@@ -61,7 +60,6 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event)                    
 }
 void MainWindow::resizeEvent(QResizeEvent *)                                                //Определяем виртуальный метод для обработки события изменение окна
 {
-    scene->processingRelease();
     scene->createQueue();
 }
 
@@ -84,7 +82,7 @@ void MainWindow::updateSizeView()
     scene->createQueue();                                                                   //Обновляем координаты операций в очереди
 }
 
-void MainWindow::addOperationsInDB(QString nameDatabase)                                    //Добавление в таблицу БД
+bool MainWindow::addOperationsInDB(QString nameDatabase)                                    //Добавление в таблицу БД
 {
     QStringList temporary;
     if(!db->outputFromTable(nameDatabase,"Operations",&temporary))                          //Если не удалось считать данные из БД
@@ -107,8 +105,7 @@ void MainWindow::addOperationsInDB(QString nameDatabase)                        
         {
             temporary.push_back(QString::number(n+i));
             temporary.push_back(ops->name);
-            temporary.push_back(QString::number(ops->pos().x()));
-            temporary.push_back(QString::number(ops->pos().y()));
+            temporary.push_back(ops->reduction);
             temporary.push_back(QString::number(ops->width/Operation::getCoef()));
             temporary.push_back(QString::number(ops->interval/Operation::getCoef()));
             temporary.push_back(QString::number(ops->dynamic));
@@ -122,7 +119,9 @@ void MainWindow::addOperationsInDB(QString nameDatabase)                        
             temporary.clear();
             i++;
         }
+        return true;
     }
+    return false;
 }
 
 void MainWindow::on_connectDB_clicked()                                                     //Слот для установки и разрыва соединения с БД
@@ -158,8 +157,8 @@ void MainWindow::on_connectDB_clicked()                                         
                                foreach(QString str, data)
                                {
                                    line = str.split(',');
-                                   if(ui->DateTimeOutBD->findText(line.at(8)) == -1)
-                                        ui->DateTimeOutBD->addItem(line.at(8));
+                                   if(ui->DateTimeOutBD->findText(line.at(7)) == -1)
+                                        ui->DateTimeOutBD->addItem(line.at(7));
                                }
                             }
                             ui->connectDB->setText("Отключиться от БД");
@@ -180,8 +179,8 @@ void MainWindow::on_InputDB_clicked()                                           
     {
         if(!scene->getOperations().isEmpty())                                               //Если на сцене есть операции
         {
-            addOperationsInDB(ui->NameDB->text());
-            QMessageBox::information(this,"Запись","Данные успешно записаны");
+            if(addOperationsInDB(ui->NameDB->text()))
+                QMessageBox::information(this,"Запись","Данные успешно записаны");
         }
         else QMessageBox::warning(this,"Ошибка","Добавьте операцию на сцену");
     }
@@ -199,15 +198,15 @@ void MainWindow::on_OutputDB_clicked()                                          
             foreach(QString str, data)
             {
                 line = str.split(',');
-                if(line.at(8) == ui->DateTimeOutBD->currentText())                          //Если считываемая дата равна выбранной и режим равен выбранному
+                if(line.at(7) == ui->DateTimeOutBD->currentText())                          //Если считываемая дата равна выбранной и режим равен выбранному
                 {
-                    if(line.at(6) == "true")                                                //Если считываемый dynamic = true
+                    if(line.at(5) == "true")                                                //Если считываемый dynamic = true
                     {
-                        scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),true);
+                        scene->addOperations(line.at(1),line.at(2),line.at(3).toDouble(),line.at(4).toDouble(),true);
                     }
                     else
                     {
-                        scene->addOperations(line.at(1),line.at(2).toDouble(),line.at(3).toDouble(),line.at(4).toDouble(),line.at(5).toDouble(),false);
+                        scene->addOperations(line.at(1),line.at(2),line.at(3).toDouble(),line.at(4).toDouble(),false);
                     }
                 }
                 line.clear();
@@ -228,29 +227,30 @@ void MainWindow::selectingAction(QString nameAction)
     }
     window->showAction(nameAction);
     window->completionCombobox(scene->getNamesOperations());
+    window->setModal(true);
     window->show();
 }
 void MainWindow::on_AddOperation_clicked()                                                  //Слот для добавления операции
 {
     selectingAction("Добавить");
 }
-void MainWindow::addOperation(QString name, double widthOperation, double intervalOperations, bool dynamic)
+void MainWindow::addOperation(QString name, QString reduction, double widthOperation, double intervalOperations, bool dynamic)
 {
-    if(scene->addOperations(name,0,0,widthOperation,intervalOperations,dynamic))
+    if(scene->addOperations(name,reduction,widthOperation,intervalOperations,dynamic))
     {                                                                                       //Если удалось добавить операцию
         window->completionCombobox(scene->getNamesOperations());
     }
-    else QMessageBox::warning(this,"Добавление","Координаты заняты другим объектом.");
+    else QMessageBox::warning(this,"Добавление","Имя занято.");
 }
 void MainWindow::on_UpdateOperation_clicked()                                               //Слот для обновления операций
 {
     selectingAction("Изменить");
 }
-void MainWindow::updateOperation(int index, QString name, double widthOperation, double intervalOperations)
+void MainWindow::updateOperation(int index, QString name, QString reduction, double widthOperation, double intervalOperations)
 {
-    if(!scene->updateOperations(index,name,0,0,widthOperation,intervalOperations))
+    if(!scene->updateOperations(index,name,reduction,widthOperation,intervalOperations))
     {
-        QMessageBox::warning(this,"Изменение","Координаты заняты другим объектом.");
+        QMessageBox::warning(this,"Изменение","Имя занято.");
     }
     else window->completionCombobox(scene->getNamesOperations());
 }
@@ -265,13 +265,16 @@ void MainWindow::deleteOperation(int index)
 }
 void MainWindow::on_InputFile_clicked()                                                     //Слот для записи данных в файл
 {
-    QString path = QFileDialog::getSaveFileName(this,"Выберите файл",QString("Сеанс √%1 %2 %3").arg(ui->number->currentText(),ui->mode->currentText(),QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
+    QDir dir;
+    dir.mkdir(dir.currentPath()+"\\Циклограмма");
+    QString path = QFileDialog::getSaveFileName(this,"Выберите файл",QString("Циклограмма\\Сеанс √%1 %2 %3").arg(ui->number->currentText(),ui->mode->currentText(),QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
                                                                                             //Получаем путь к файлу
     if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
         if(!scene->getOperations().isEmpty())                                               //Если сцена не пустая
         {
-            ui->statusbar->showMessage("Запись в файл: "+path.split('/').back(),5000);
+            ui->statusbar->showMessage("Запись в файл: "+path.split('/').back());
+            ui->statusbar->setStyleSheet("background: yellow");
             if(!fileInOut->inputJSONFile(scene->getOperations(),path))                      //Если не удалось записать в файл
             {
                  QMessageBox::warning(this,"Ошибка","Не удалось записать в файл");
@@ -288,7 +291,7 @@ void MainWindow::on_InputFile_clicked()                                         
         QMessageBox::warning(this,"Путь к файлу","Путь к файлу указан неверно");
 }
 
-bool MainWindow::on_OutputFile_clicked()                                                    //Слот для считывания данных из файла
+bool MainWindow::OutputFile()                                                               //Слот для считывания данных из файла
 {
     QString path = QFileDialog::getOpenFileName(this,"Выберите файл","",tr("*.json"));      //Получаем путь к файлу
     if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
@@ -297,18 +300,17 @@ bool MainWindow::on_OutputFile_clicked()                                        
         fileInOut->outputJSONFile(path,vectorGeometry);                                     //Считываем данные из файла
         if(!vectorGeometry->empty())
         {
-            ui->statusbar->showMessage("Чтение из файла: "+path.split('/').back(),5000);
-            if(QMessageBox::information(this,"Очистка","Необходимо ли очистить сцену?",QMessageBox::StandardButton::Ok,QMessageBox::StandardButton::No) == QMessageBox::Ok)
-            {
-                scene->allClear();
-                ui->graphicsView->setMinimumWidth(0);
-                ui->graphicsView->setMaximumWidth(925);
-            }
+            ui->statusbar->showMessage("Чтение из файла: "+path.split('/').back());
+            ui->statusbar->setStyleSheet("background: yellow; font-size: 10pt");
+            scene->allClear();
+            ui->graphicsView->setMinimumWidth(0);
+            ui->graphicsView->setMaximumWidth(925);
             foreach(Geometry geom, *vectorGeometry)
             {
-                scene->addOperations(geom.name,0,0,geom.width,geom.interval,geom.dynamic); //Добавляем на сцену
+                scene->addOperations(geom.name,geom.reduction,geom.width,geom.interval,geom.dynamic);
+                                                                                            //Добавляем на сцену
             }
-            scene->createQueue(59,60);
+            scene->createQueue();
             return true;
         }
         else
@@ -326,43 +328,42 @@ void MainWindow::on_createCyclogram_triggered()
     ui->UpdateOperation->setEnabled(true);
     ui->DeleteOperation->setEnabled(true);
     ui->InputFile->setEnabled(true);
-    ui->OutputFile->setEnabled(true);
     ui->connectDB->setEnabled(true);
     ui->InputDB->setEnabled(true);
     ui->OutputDB->setEnabled(true);
     scene->allClear();
-    ui->graphicsView->setMinimumWidth(0);
-    ui->graphicsView->setMaximumWidth(925);
+    updateSizeView();
+    scene->update();
 }
 
 void MainWindow::on_updateCyclogram_triggered()
 {
-    if(on_OutputFile_clicked())
+    if(OutputFile())
     {
         ui->graphicsView->setEnabled(true);
         ui->AddOperation->setEnabled(true);
         ui->UpdateOperation->setEnabled(true);
         ui->DeleteOperation->setEnabled(true);
         ui->InputFile->setEnabled(true);
-        ui->OutputFile->setEnabled(true);
         ui->connectDB->setEnabled(true);
         ui->InputDB->setEnabled(true);
         ui->OutputDB->setEnabled(true);
     }
+    scene->update();
 }
 
 void MainWindow::on_showCyclogram_triggered()
 {
-    if(on_OutputFile_clicked())
+    if(OutputFile())
     {
         ui->graphicsView->setEnabled(false);
         ui->AddOperation->setEnabled(false);
         ui->UpdateOperation->setEnabled(false);
         ui->DeleteOperation->setEnabled(false);
         ui->InputFile->setEnabled(false);
-        ui->OutputFile->setEnabled(false);
         ui->connectDB->setEnabled(false);
         ui->InputDB->setEnabled(false);
         ui->OutputDB->setEnabled(false);
     }
+    scene->update();
 }
