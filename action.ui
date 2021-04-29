@@ -145,16 +145,6 @@
        <widget class="QComboBox" name="comboBox"/>
       </item>
       <item>
-       <widget class="QLabel" name="label_14">
-        <property name="text">
-         <string>Название операции</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="nameOperations_2"/>
-      </item>
-      <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>Продолжительность</string>

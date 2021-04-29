@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QMessageBox>
 #include "fileinout.h"
-#include <QDir>
 
 namespace Ui {
 class Action;
@@ -23,8 +22,7 @@ public:
 private:
     Ui::Action *ui;
     FileInOut *file = nullptr;
-    QStringList *namesOperations = nullptr;
-    QStringList *reductionOperations = nullptr;
+    QVector<Geometry> *operations = nullptr;
 
 signals:
     void signalAddOperation(QString name, QString reduction, double widthOperation, double intervalOperations, bool dynamic);
@@ -35,6 +33,7 @@ private slots:
     void on_UpdateOperation_clicked();
     void on_DeleteOperation_clicked();
     void on_comboBox_4_currentIndexChanged(int index);
+    void on_comboBox_currentIndexChanged(const QString &arg1);
 };
 
 #endif // ACTION_H

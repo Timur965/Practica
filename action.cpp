@@ -7,24 +7,22 @@ Action::Action(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->comboBox_4->addItem("Динамический");
-    ui->comboBox_4->addItem("Разовая команда");
-
-    if(namesOperations == nullptr)
+    if(operations == nullptr)
     {
-        namesOperations = new QStringList();
-        reductionOperations = new QStringList();
+        operations = new QVector<Geometry>();
         file = new FileInOut();
-        if(file->outputNamesOperation(QDir::currentPath()+"\\Циклограмма\\Названия операций.json", namesOperations, reductionOperations))
+        if(file->outputNamesOperation(QApplication::applicationDirPath()+"\\Циклограмма\\Названия операций.json", operations))
         {
-            foreach(QString str, *namesOperations)
+            foreach(Geometry geom, *operations)
             {
-                ui->nameOperations->addItem(str);
-                ui->nameOperations_2->addItem(str);
+                ui->nameOperations->addItem(geom.name);
             }
         }
         else QMessageBox::warning(this,"Ошибка","Не удалось считать названия операций");
     }
+
+    ui->comboBox_4->addItem("Динамический");
+    ui->comboBox_4->addItem("Разовая команда");
 }
 
 Action::~Action()
@@ -32,10 +30,8 @@ Action::~Action()
     delete ui;
     if(file != nullptr)
         delete file;
-    if(namesOperations != nullptr)
-        delete namesOperations;
-    if(reductionOperations != nullptr)
-        delete reductionOperations;
+    if(operations != nullptr)
+        delete operations;
 }
 void Action::completionCombobox(QVector<QString> data)
 {
@@ -80,7 +76,7 @@ void Action::on_AddOperation_clicked()
         if(ui->operationWidth->text().toDouble() >=1 &&
            ui->operationWidth->text().toDouble() <= 360 &&
            ui->operationInterval->text().toDouble() >= 0 &&
-           ui->operationInterval->text().toDouble() < 360)                                  //Проверка чтобы вводимые данные не выходили за границы представления
+           ui->operationInterval->text().toDouble() <= 360)                                 //Проверка чтобы вводимые данные не выходили за границы представления
         {
             if(ui->comboBox_4->currentIndex() == 0)                                         //Если выбрана динамическая операция
             {
@@ -90,7 +86,17 @@ void Action::on_AddOperation_clicked()
             {
                 dynamic = false;
             }
-            emit signalAddOperation(ui->nameOperations->currentText(),reductionOperations->at(ui->nameOperations->currentIndex()),ui->operationWidth->text().toDouble(),ui->operationInterval->text().toDouble(),dynamic);
+            int index = -1;
+            int i = 0;
+            foreach(Geometry ops, *operations)
+            {
+                if(ops.name == ui->nameOperations->currentText())
+                {
+                    index = i;
+                }
+                i++;
+            }
+            emit signalAddOperation(ui->nameOperations->currentText(),operations->at(index).reduction,ui->operationWidth->text().toDouble(),ui->operationInterval->text().toDouble(),dynamic);
         }
         else QMessageBox::warning(this,"Неккоректные данные","Вы ввели слишком большие или\n слишко малые координаты.");
     }
@@ -110,7 +116,17 @@ void Action::on_UpdateOperation_clicked()
         {
             if(ui->comboBox->count() != NULL)                                               //Проверка если количество записей в combobox не равно 0
             {
-                emit signalUpdateOperation(ui->comboBox->currentIndex(),ui->nameOperations_2->currentText(),reductionOperations->at(ui->nameOperations_2->currentIndex()),ui->operationWidth_2->text().toDouble(),ui->operationInterval_2->text().toDouble());
+                int index = -1;
+                int i = 0;
+                foreach(Geometry ops, *operations)
+                {
+                    if(ops.name == ui->comboBox->currentText())
+                    {
+                        index = i;
+                    }
+                    i++;
+                }
+                emit signalUpdateOperation(ui->comboBox->currentIndex(),ui->comboBox->currentText(),operations->at(index).reduction,ui->operationWidth_2->text().toDouble(),ui->operationInterval_2->text().toDouble());
             }
             else QMessageBox::warning(this,"Неккоректные данные","Выберите операцию для изменения");
         }
@@ -136,16 +152,57 @@ void Action::on_DeleteOperation_clicked()
 
 void Action::on_comboBox_4_currentIndexChanged(int index)
 {
-    if(index==0)
+    if(index == 0)
     {
         ui->operationWidth->show();
         ui->operationWidth->setText("");
         ui->label_3->show();
+
+        ui->nameOperations->clear();
+        foreach(Geometry ops, *operations)
+        {
+            if(ops.dynamic)
+            {
+                ui->nameOperations->addItem(ops.name);
+            }
+        }
+
     }
-    if(index==1)
+    if(index == 1)
     {
         ui->operationWidth->hide();
         ui->operationWidth->setText("1");
         ui->label_3->hide();
+
+        ui->nameOperations->clear();
+        foreach(Geometry ops, *operations)
+        {
+            if(!ops.dynamic)
+            {
+                ui->nameOperations->addItem(ops.name);
+            }
+        }
+    }
+}
+
+void Action::on_comboBox_currentIndexChanged(const QString &arg1)
+{
+    foreach(Geometry ops, *operations)
+    {
+        if(arg1 == ops.name)
+        {
+            if(ops.dynamic)
+            {
+                ui->operationWidth_2->show();
+                ui->operationWidth_2->setText("");
+                ui->label_5->show();
+            }
+            else
+            {
+                ui->operationWidth_2->hide();
+                ui->operationWidth_2->setText("1");
+                ui->label_5->hide();
+            }
+        }
     }
 }

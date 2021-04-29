@@ -66,13 +66,14 @@ bool FileInOut::outputJSONFile(QString path, QVector<Geometry> *vectorGeom)     
     }
     return false;
 }
-bool FileInOut::outputNamesOperation(QString path, QStringList *namesOperations, QStringList *reductionOperations)
+bool FileInOut::outputNamesOperation(QString path, QVector<Geometry> *vectorGeom)
 {
     QFile file1(path);                                                                         //Объект с путём к файлу
     QJsonObject jsObj;                                                                         //Создаём JSON объект
     QJsonDocument doc;                                                                         //Создаём JSON документ
     QString strJs;
     QJsonArray jsArray;                                                                        //Создаём JSON массив
+    Geometry geom;
     if(file1.open(QIODevice::ReadOnly))
     {
         strJs = file1.readAll();                                                               //Считываем весь файл
@@ -81,8 +82,10 @@ bool FileInOut::outputNamesOperation(QString path, QStringList *namesOperations,
         jsArray = jsObj["namesOperations"].toArray();                                          //Разбираем объект на массив
         foreach(QJsonValue js, jsArray)
         {
-            namesOperations->push_back(js["name"].toString());
-            reductionOperations->push_back(js["reduction"].toString());
+            geom.name = js["name"].toString();
+            geom.reduction = js["reduction"].toString();
+            geom.dynamic = js["dynamic"].toBool();
+            vectorGeom->push_back(geom);
         }
         file1.close();
         return true;

@@ -247,11 +247,11 @@ void MainWindow::on_UpdateOperation_clicked()                                   
 }
 void MainWindow::updateOperation(int index, QString name, QString reduction, double widthOperation, double intervalOperations)
 {
-    if(!scene->updateOperations(index,name,reduction,widthOperation,intervalOperations))
+    if(scene->updateOperations(index,name,reduction,widthOperation,intervalOperations))
     {
-        QMessageBox::warning(this,"Изменение","Имя занято.");
+        window->completionCombobox(scene->getNamesOperations());
     }
-    else window->completionCombobox(scene->getNamesOperations());
+    else QMessageBox::warning(this,"Изменение","Имя занято.");;
 }
 void MainWindow::on_DeleteOperation_clicked()                                               //Слот для удаления операций
 {
@@ -265,15 +265,14 @@ void MainWindow::deleteOperation(int index)
 void MainWindow::on_InputFile_clicked()                                                     //Слот для записи данных в файл
 {
     QDir dir;
-    dir.mkdir(dir.currentPath()+"\\Циклограмма");
-    QString path = QFileDialog::getSaveFileName(this,"Выберите файл",QString("Циклограмма\\Сеанс √%1 %2 %3").arg(ui->number->currentText(),ui->mode->currentText(),QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
+    dir.mkdir(QApplication::applicationDirPath()+"\\Циклограмма");
+    QString path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),ui->mode->currentText(),QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
                                                                                             //Получаем путь к файлу
     if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
         if(!scene->getOperations().isEmpty())                                               //Если сцена не пустая
         {
-            ui->statusbar->showMessage("Запись в файл: "+path.split('/').back());
-            ui->statusbar->setStyleSheet("background: yellow");
+            setWindowTitle("Разработка циклограммы "+path.split('/').back());
             if(!fileInOut->inputJSONFile(scene->getOperations(),path))                      //Если не удалось записать в файл
             {
                  QMessageBox::warning(this,"Ошибка","Не удалось записать в файл");
@@ -292,15 +291,14 @@ void MainWindow::on_InputFile_clicked()                                         
 
 bool MainWindow::OutputFile()                                                               //Слот для считывания данных из файла
 {
-    QString path = QFileDialog::getOpenFileName(this,"Выберите файл","",tr("*.json"));      //Получаем путь к файлу
+    QString path = QFileDialog::getOpenFileName(this,"Выберите файл",QApplication::applicationDirPath()+"\\Циклограмма",tr("*.json"));      //Получаем путь к файлу
     if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
         vectorGeometry = new QVector<Geometry>();
         fileInOut->outputJSONFile(path,vectorGeometry);                                     //Считываем данные из файла
         if(!vectorGeometry->empty())
         {
-            ui->statusbar->showMessage("Чтение из файла: "+path.split('/').back());
-            ui->statusbar->setStyleSheet("background: yellow; font-size: 10pt");
+            setWindowTitle("Разработка циклограммы "+path.split('/').back());
             scene->allClear();
             ui->graphicsView->setMinimumWidth(0);
             ui->graphicsView->setMaximumWidth(925);
