@@ -15,7 +15,7 @@ public:
     virtual ~MyGraphicScene() override;
     bool addOperations(QString name="Операция", QString reduction="", double width=60, double interval=0, bool dynamic=true);      //Метод для добавления операции на сцену
     bool updateOperations(int index, QString name, QString reduction, double width, double interval);                              //Метод для обновления операции на сцене
-    void deleteOperations(int index);                                                                                              //Метод для удаления операции со сцены
+    bool deleteOperations(int index);                                                                                              //Метод для удаления операции со сцены
     void createQueue(int coord = 59, int coordHeight = 90);                                                                        //Метод для построения очереди
     void updateCoordOperations(int coord = 60);                                                                                    //Метод для обовления координат операций не добавленных в очередь
     void processingRelease();                                                                                                      //Метод для обработки операции после изменения ширины

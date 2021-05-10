@@ -22,6 +22,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(scene,&MyGraphicScene::decreaseView,this,&MainWindow::updateDecreaseView);     //Соединение сигнала со слотом
     connect(scene,&MyGraphicScene::setSizeGraphicsView,this,&MainWindow::updateSizeView);  //Соединение сигнала со слотом
 
+    window = new Action();
+    connect(window,&Action::signalAddOperation,this,&MainWindow::addOperation);
+    connect(window,&Action::signalUpdateOperation,this,&MainWindow::updateOperation);
+    connect(window,&Action::signalDeleteOperation,this,&MainWindow::deleteOperation);
+
     ui->graphicsView->setEnabled(false);
     ui->AddOperation->setEnabled(false);
     ui->UpdateOperation->setEnabled(false);
@@ -30,9 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->connectDB->setEnabled(false);
     ui->InputDB->setEnabled(false);
     ui->OutputDB->setEnabled(false);
-
-    ui->mode->addItem("Запись информации");
-    ui->mode->addItem("Воспроизведение информации");
 
     for(int i=1;i<=10;i++)
     {
@@ -139,6 +141,7 @@ void MainWindow::on_connectDB_clicked()                                         
                     {
                         db->closeConnection();
                         ui->connectDB->setText("Подключиться к БД");
+                        ui->DateTimeOutBD->clear();
                     }
                     else                                                                    //Если соединение не установлено
                     {
@@ -179,7 +182,21 @@ void MainWindow::on_InputDB_clicked()                                           
         if(!scene->getOperations().isEmpty())                                               //Если на сцене есть операции
         {
             if(addOperationsInDB(ui->NameDB->text()))
+            {
                 QMessageBox::information(this,"Запись","Данные успешно записаны");
+                QStringList data;
+                if(db->outputFromTable("Cyclogram","Operations",&data))                     //Если удалось считать данные из БД
+                {
+                   QStringList line;
+                   ui->DateTimeOutBD->clear();
+                   foreach(QString str, data)
+                   {
+                       line = str.split(',');
+                       if(ui->DateTimeOutBD->findText(line.at(6)) == -1)
+                            ui->DateTimeOutBD->addItem(line.at(6));
+                   }
+                }
+            }
         }
         else QMessageBox::warning(this,"Ошибка","Добавьте операцию на сцену");
     }
@@ -194,10 +211,14 @@ void MainWindow::on_OutputDB_clicked()                                          
         if(db->outputFromTable("Cyclogram","Operations",&data))                             //Если удалось считать данные из БД
         {
             QStringList line;
+            scene->allClear();
+            window->afterDelete();
+            ui->graphicsView->setMinimumWidth(0);
+            ui->graphicsView->setMaximumWidth(925);
             foreach(QString str, data)
             {
                 line = str.split(',');
-                if(line.at(6) == ui->DateTimeOutBD->currentText())                          //Если считываемая дата равна выбранной и режим равен выбранному
+                if(line.at(6) == ui->DateTimeOutBD->currentText())                          //Если считываемая дата равна выбранной
                 {
                     if(line.at(5) == "true")                                                //Если считываемый dynamic = true
                     {
@@ -207,6 +228,11 @@ void MainWindow::on_OutputDB_clicked()                                          
                     {
                         scene->addOperations(line.at(1),line.at(2),line.at(3).toDouble(),line.at(4).toDouble(),false);
                     }
+                    window->completionCombobox(scene->getNamesOperations());
+                    if(scene->getNamesOperations().contains("Запись информации"))
+                        window->afterAdd("Запись информации");
+                    if(scene->getNamesOperations().contains("Воспроизведение информации"))
+                        window->afterAdd("Воспроизведение информации");
                 }
                 line.clear();
             }
@@ -217,13 +243,6 @@ void MainWindow::on_OutputDB_clicked()                                          
 }
 void MainWindow::selectingAction(QString nameAction)
 {
-    if(window == nullptr)
-    {
-        window = new Action();
-        connect(window,&Action::signalAddOperation,this,&MainWindow::addOperation);
-        connect(window,&Action::signalUpdateOperation,this,&MainWindow::updateOperation);
-        connect(window,&Action::signalDeleteOperation,this,&MainWindow::deleteOperation);
-    }
     window->showAction(nameAction);
     window->completionCombobox(scene->getNamesOperations());
     window->setModal(true);
@@ -238,6 +257,10 @@ void MainWindow::addOperation(QString name, QString reduction, double widthOpera
     if(scene->addOperations(name,reduction,widthOperation,intervalOperations,dynamic))
     {                                                                                       //Если удалось добавить операцию
         window->completionCombobox(scene->getNamesOperations());
+        if(scene->getNamesOperations().contains("Запись информации"))
+            window->afterAdd("Запись информации");
+        if(scene->getNamesOperations().contains("Воспроизведение информации"))
+            window->afterAdd("Воспроизведение информации");
     }
     else QMessageBox::warning(this,"Добавление","Имя занято.");
 }
@@ -251,7 +274,7 @@ void MainWindow::updateOperation(int index, QString name, QString reduction, dou
     {
         window->completionCombobox(scene->getNamesOperations());
     }
-    else QMessageBox::warning(this,"Изменение","Имя занято.");;
+    else QMessageBox::warning(this,"Изменение","Имя занято.");
 }
 void MainWindow::on_DeleteOperation_clicked()                                               //Слот для удаления операций
 {
@@ -259,15 +282,33 @@ void MainWindow::on_DeleteOperation_clicked()                                   
 }
 void MainWindow::deleteOperation(int index)
 {
-    scene->deleteOperations(index);
-    window->completionCombobox(scene->getNamesOperations());
+    if(scene->deleteOperations(index))
+    {
+        window->completionCombobox(scene->getNamesOperations());
+        if(!scene->getNamesOperations().contains("Запись информации")|| !scene->getNamesOperations().contains("Воспроизведение информации"))
+            window->afterDelete();
+    }
+    else QMessageBox::warning(this,"Удаление","Не получилось удалить.");
+
 }
 void MainWindow::on_InputFile_clicked()                                                     //Слот для записи данных в файл
 {
     QDir dir;
     dir.mkdir(QApplication::applicationDirPath()+"\\Циклограмма");
-    QString path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),ui->mode->currentText(),QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
+    QString path;
+    if(scene->getNamesOperations().indexOf("Запись информации") != -1)
+    {
+        path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),"Запись информации",QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
                                                                                             //Получаем путь к файлу
+    }
+    else
+    {
+        if(scene->getNamesOperations().indexOf("Воспроизведение информации") != -1)
+            path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),"Воспроизведение информации",QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
+                                                                                                //Получаем путь к файлу
+        else
+            path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма"),tr("*.json"));
+    }
     if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
     {
         if(!scene->getOperations().isEmpty())                                               //Если сцена не пустая
@@ -300,6 +341,7 @@ bool MainWindow::OutputFile()                                                   
         {
             setWindowTitle("Разработка циклограммы "+path.split('/').back());
             scene->allClear();
+            window->afterDelete();
             ui->graphicsView->setMinimumWidth(0);
             ui->graphicsView->setMaximumWidth(925);
             foreach(Geometry geom, *vectorGeometry)
@@ -307,6 +349,11 @@ bool MainWindow::OutputFile()                                                   
                 scene->addOperations(geom.name,geom.reduction,geom.width,geom.interval,geom.dynamic);
                                                                                             //Добавляем на сцену
             }
+            window->completionCombobox(scene->getNamesOperations());
+            if(scene->getNamesOperations().contains("Запись информации"))
+                window->afterAdd("Запись информации");
+            if(scene->getNamesOperations().contains("Воспроизведение информации"))
+                window->afterAdd("Воспроизведение информации");
             scene->createQueue();
             return true;
         }
@@ -329,6 +376,7 @@ void MainWindow::on_createCyclogram_triggered()
     ui->InputDB->setEnabled(true);
     ui->OutputDB->setEnabled(true);
     scene->allClear();
+    window->afterDelete();
     updateSizeView();
     scene->update();
 }

@@ -18,7 +18,8 @@ public:
     ~Action();
     void completionCombobox(QVector<QString> data);
     void showAction(QString nameAction);
-
+    void afterAdd(QString nameOperation);
+    bool afterDelete();
 private:
     Ui::Action *ui;
     FileInOut *file = nullptr;

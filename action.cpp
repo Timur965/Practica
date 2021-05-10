@@ -11,14 +11,8 @@ Action::Action(QWidget *parent) :
     {
         operations = new QVector<Geometry>();
         file = new FileInOut();
-        if(file->outputNamesOperation(QApplication::applicationDirPath()+"\\Циклограмма\\Названия операций.json", operations))
-        {
-            foreach(Geometry geom, *operations)
-            {
-                ui->nameOperations->addItem(geom.name);
-            }
-        }
-        else QMessageBox::warning(this,"Ошибка","Не удалось считать названия операций");
+        if(!afterDelete())
+            QMessageBox::warning(this,"Ошибка","Не удалось считать названия операций");
     }
 
     ui->comboBox_4->addItem("Динамический");
@@ -67,6 +61,46 @@ void Action::showAction(QString nameAction)
         setWindowTitle("Удаление");                                                         //Устанавливаем заголовок окну
     }
 }
+void Action::afterAdd(QString nameOperation)
+{
+    int i=0;
+    if(nameOperation.contains("Запись информации"))
+    {
+        foreach(Geometry geom, *operations)
+        {
+            if(geom.name.contains("Воспроизведение информации"))
+                operations->removeAt(i);
+            i++;
+        }
+    }
+    if(nameOperation.contains("Воспроизведение информации"))
+    {
+        foreach(Geometry geom, *operations)
+        {
+            if(geom.name.contains("Запись информации"))
+                operations->removeAt(i);
+            i++;
+        }
+    }
+    on_comboBox_4_currentIndexChanged(ui->comboBox_4->currentIndex());
+}
+bool Action::afterDelete()
+{
+    if(file!=nullptr)
+    {
+        operations->clear();
+        if(file->outputNamesOperation(QApplication::applicationDirPath()+"\\Циклограмма\\Названия операций.json", operations))
+        {
+            foreach(Geometry geom, *operations)
+            {
+                ui->nameOperations->addItem(geom.name);
+            }
+            on_comboBox_4_currentIndexChanged(ui->comboBox_4->currentIndex());
+            return true;
+        }
+    }
+    return false;
+}
 void Action::on_AddOperation_clicked()
 {
     QRegExp rgx("\\d{1,3}");                                                                //Создаём регулярное выражение
@@ -75,7 +109,7 @@ void Action::on_AddOperation_clicked()
     {                                                                                       //Проверка что вводятся цифры
         if(ui->operationWidth->text().toDouble() >=1 &&
            ui->operationWidth->text().toDouble() <= 360 &&
-           ui->operationInterval->text().toDouble() >= 0 &&
+           ui->operationInterval->text().toDouble() >= 1 &&
            ui->operationInterval->text().toDouble() <= 360)                                 //Проверка чтобы вводимые данные не выходили за границы представления
         {
             if(ui->comboBox_4->currentIndex() == 0)                                         //Если выбрана динамическая операция
@@ -111,7 +145,7 @@ void Action::on_UpdateOperation_clicked()
         rgx.setPattern("^[А-Я]|[а-я]$");
         if(ui->operationWidth_2->text().toDouble() >=1 &&
            ui->operationWidth_2->text().toDouble() <= 360 &&
-           ui->operationInterval_2->text().toDouble() >=0 &&
+           ui->operationInterval_2->text().toDouble() >=1 &&
            ui->operationInterval_2->text().toDouble() <= 360)                               //Проверка чтобы вводимые данные не выходили за границы представления
         {
             if(ui->comboBox->count() != NULL)                                               //Проверка если количество записей в combobox не равно 0

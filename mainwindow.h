@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include "mygraphicscene.h"
 #include "database.h"
-#include "fileinout.h"
 #include "action.h"
 #include <QGraphicsView>
 #include <QMouseEvent>

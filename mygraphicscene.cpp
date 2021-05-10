@@ -67,24 +67,21 @@ bool MyGraphicScene::addOperations(QString name, QString reduction, double width
 }
 bool MyGraphicScene::updateOperations(int index, QString name, QString reduction, double width, double interval)             //Изменение операции на сцене
 {
-    if(!checkName(name) || operations.at(index)->name == name)                                                               //Проверяем не занято ли имя
-    {
-        operations.at(index)->transformOperation(name,reduction,width,interval);                                             //Изменяем объект на сцене
-        connect(operations.at(index),&Operation::changeOperation,this,&MyGraphicScene::processingChange);
-        this->createQueue();
-        this->processingRelease();
-        this->update();                                                                                                      //Обновляем сцену
-        return true;
-    }
-    return false;
+    operations.at(index)->transformOperation(name,reduction,width,interval);                                                 //Изменяем объект на сцене
+    connect(operations.at(index),&Operation::changeOperation,this,&MyGraphicScene::processingChange);
+    this->createQueue();
+    this->processingRelease();
+    this->update();                                                                                                          //Обновляем сцену
+    return true;
 }
-void MyGraphicScene::deleteOperations(int index)                                                                             //Удаление операции со сцены
+bool MyGraphicScene::deleteOperations(int index)                                                                             //Удаление операции со сцены
 {
     this->removeItem(operations.at(index));                                                                                  //Удаленяем операцию со сцены
     operations.remove(index);                                                                                                //Удаляем указатель на операцию из вектора
     this->createQueue();
     this->processingRelease();
     this->update();                                                                                                          //Обновляем сцену
+    return true;
 }
 void MyGraphicScene::drawBackground(QPainter *painter, const QRectF &)                                                       //Отрисовка заднего фона
 {
@@ -167,7 +164,10 @@ void MyGraphicScene::processingRelease()                                        
     double x = -width/2+59;                                                                                                  //Начало координат по х
     foreach(Operation *ops, operations)
     {
-        x = x+ops->width + ops->interval;
+        if(ops->dynamic)
+            x = x + ops->width + ops->interval;
+        else
+            x = x + ops->width + ops->interval - 1;
     }
     if((x < 925/2+59 || operations.empty()) && oldWidth.empty())
     {

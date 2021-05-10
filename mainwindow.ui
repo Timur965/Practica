@@ -165,16 +165,6 @@
          <widget class="QComboBox" name="number"/>
         </item>
         <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Режим</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="mode"/>
-        </item>
-        <item>
          <widget class="QPushButton" name="InputFile">
           <property name="text">
            <string>Записать в файл</string>
