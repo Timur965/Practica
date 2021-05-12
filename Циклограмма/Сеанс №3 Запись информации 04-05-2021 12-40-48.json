@@ -1,1 +1,1 @@
-{"Operations":[{"dynamic":true,"interval":1,"name":"Запись информации","reduction":"ЗИ","width":10}]}
+{"Operations":[{"dynamic":true,"interval":5,"name":"Запись информации","reduction":"ЗИ","width":5}]}

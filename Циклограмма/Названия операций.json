@@ -1,1 +1,9 @@
-{"namesOperations":[{"name":"Т0","reduction":"Т0","dynamic":false},{"name":"РК1","reduction":"РК1","dynamic":false},{"name":"РК2","reduction":"РК2","dynamic":false},{"name":"РК3","reduction":"РК3","dynamic":false},{"name":"Код московского времени","reduction":"КодМВ","dynamic":false},{"name":"Команда программно-информационной последовательности","reduction":"КПИ","dynamic":false},{"name":"Запись информации","reduction":"ЗИ","dynamic":true},{"name":"Воспроизведение информации","reduction":"ВИ","dynamic":true},{"name":"Тк","reduction":"Тк","dynamic":false}]}
+{"namesOperations":[{"name":"Т0","reduction":"Т0","dynamic":false},
+{"name":"РК1","reduction":"РК1","dynamic":false},
+{"name":"РК2","reduction":"РК2","dynamic":false},
+{"name":"РК3","reduction":"РК3","dynamic":false},
+{"name":"Код московского времени","reduction":"КодМВ","dynamic":false},
+{"name":"Команда программно-информационной последовательности","reduction":"КПИ","dynamic":false},
+{"name":"Запись информации","reduction":"ЗИ","dynamic":true},
+{"name":"Воспроизведение информации","reduction":"ВИ","dynamic":true},
+{"name":"Тк","reduction":"Тк","dynamic":false}]}
