@@ -1,11 +1,19 @@
 #include "operation.h"
 
-int Operation::id = 1;
-int Operation::coef = 30;
+int Operation::id = 0;
+int Operation::coef = 60;
 Operation::Operation(QString name, QString reduction, double width, double interval, bool dynamic)
 {
-    this->name = name;
-    this->reduction = reduction;
+    if(!reduction.contains("ЗИ") || (reduction.contains("ЗИ") && id == 0))
+    {
+        this->name = name;
+        this->reduction = reduction;
+    }
+    else
+    {
+        this->name = name + QString::number(id);
+        this->reduction = reduction + QString::number(id);
+    }
 
     if(!dynamic)
     {
@@ -19,7 +27,8 @@ Operation::Operation(QString name, QString reduction, double width, double inter
     this->dynamic = dynamic;
     transformOperation(this->name,this->reduction,this->width,this->interval);
 
-    id++;
+    if(reduction.contains("ЗИ"))
+        id++;
     setFlag(QGraphicsItem::ItemIsFocusable);
     this->setAcceptHoverEvents(true);
 }
@@ -51,18 +60,18 @@ void Operation::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     {
         painter->drawText(interval,rect.topLeft().y()-50,rect.width()+35,rect.height(),Qt::AlignLeft,"Тн"+reduction);                                   //Отрисовываем Тн
         if(this->width > 75)
-            painter->drawText(-3+interval,rect.topLeft().y()-50,rect.width(),rect.height(),Qt::AlignRight,"Тк"+reduction);                              //Отрисовываем Тк
+            painter->drawText(interval,rect.topLeft().y()-50,rect.width(),rect.height(),Qt::AlignRight,"Тк"+reduction);                              //Отрисовываем Тк
         else
         {
             if(this->width > 50 && this->width < 75)
-                painter->drawText(-3+interval,rect.topLeft().y()-35,rect.width(),rect.height(),Qt::AlignRight,"Тк"+reduction);
+                painter->drawText(interval,rect.topLeft().y()-35,rect.width(),rect.height(),Qt::AlignRight,"Тк"+reduction);
             else
-                painter->drawText(-3+interval,rect.topLeft().y()-35,rect.width()+35,rect.height(),Qt::AlignRight,"Тк"+reduction);
+                painter->drawText(interval,rect.topLeft().y()-35,rect.width()+35,rect.height(),Qt::AlignRight,"Тк"+reduction);
         }
     }
     else
     {
-        painter->drawText(interval,rect.topLeft().y()-70,rect.width()+35,rect.height(),Qt::AlignLeft,reduction);
+        painter->drawText(interval,rect.topLeft().y()-70,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
     }
     if(dynamic)
     {
@@ -86,6 +95,10 @@ void Operation::setCoordStart(int coord)                                        
 int Operation::getCoef()                                                                                                                               //Метод для получения коэффицента ширины операции
 {
     return coef;
+}
+int Operation::getId()                                                                                                                               //Метод для получения коэффицента ширины операции
+{
+    return id;
 }
 void Operation::transformOperation(QString name, QString reduction, double width, double interval)                                                     //Изменение операции
 {

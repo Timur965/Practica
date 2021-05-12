@@ -30,7 +30,7 @@ private:
     DataBase *db=nullptr;
     FileInOut *fileInOut = nullptr;                                         //Указатель класса fileInOut
     Action *window = nullptr;
-    bool addOperationsInDB(QString nameDatabase);                           //Добавление в таблицу БД
+    bool addOperationsInDB();                                               //Добавление в таблицу БД
     QVector<Geometry> *vectorGeometry = nullptr;                            //Данные операций из файла
     void selectingAction(QString nameAction);
     bool OutputFile();                                                      //Метод для считывания данных из файла

@@ -48,6 +48,10 @@ bool MyGraphicScene::checkName(QString name)
             break;
         }
     }
+    if(name.contains("Запись информации") && Operation::getId() <= 10)
+    {
+        oldName = false;
+    }
     return oldName;
 }
 bool MyGraphicScene::addOperations(QString name, QString reduction, double width, double interval, bool dynamic)             //Добавление операции на сцену

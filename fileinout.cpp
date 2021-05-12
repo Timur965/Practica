@@ -38,6 +38,36 @@ bool FileInOut::inputJSONFile(QVector<Operation *> operations, QString path)    
     }
     return false;
 }
+bool FileInOut::inputFile(QVector<Operation *> operations, QString path)
+{
+    QFile file1(path);                                                                         //Объект с путём к файлу
+    if(file1.open(QIODevice::WriteOnly))
+    {
+        if(!operations.isEmpty())
+        {
+            QTextStream stream(&file1);
+            QString transmissionСhannel;
+            foreach(Operation *ops, operations)
+            {
+                if(ops->reduction.contains("Т0") || ops->reduction.contains("РК") || ops->reduction.contains("КодМВ"))
+                    transmissionСhannel = "RS-232";
+                if(ops->reduction.contains("КПИ"))
+                    transmissionСhannel = "МКО БВС";
+                if(ops->reduction.contains("ЗИ"))
+                    transmissionСhannel = "МКО СТИ";
+                if(ops->reduction.contains("ВИ"))
+                    transmissionСhannel = "USB";
+                if(ops->dynamic)
+                    stream<<ops->start<<"\t-\t"<<ops->end<<"\t-\t"<<ops->reduction<<"\t-\t"<<transmissionСhannel<<"\n";
+                else
+                    stream<<ops->start<<"\t-\t"<<ops->start<<"\t-\t"<<ops->reduction<<"\t-\t"<<transmissionСhannel<<"\n";
+            }
+            return true;
+            file1.close();
+        }
+    }
+    return false;
+}
 bool FileInOut::outputJSONFile(QString path, QVector<Geometry> *vectorGeom)                    //Считывание из JSON файла
 {
     QFile file1(path);                                                                         //Объект с путём к файлу

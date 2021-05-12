@@ -196,7 +196,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="LoginDB"/>
+         <widget class="QLineEdit" name="LoginDB">
+          <property name="text">
+           <string>postgres</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_17">
@@ -207,6 +211,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="PasswordDB">
+          <property name="text">
+           <string>timurka01</string>
+          </property>
           <property name="echoMode">
            <enum>QLineEdit::Password</enum>
           </property>
@@ -220,7 +227,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="HostDB"/>
+         <widget class="QLineEdit" name="HostDB">
+          <property name="text">
+           <string>127.0.0.1</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_19">
@@ -230,7 +241,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="NameDB"/>
+         <widget class="QLineEdit" name="NameDB">
+          <property name="text">
+           <string>Cyclogram</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="connectDB">

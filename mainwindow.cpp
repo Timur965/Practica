@@ -84,44 +84,35 @@ void MainWindow::updateSizeView()
     scene->createQueue();                                                                   //Обновляем координаты операций в очереди
 }
 
-bool MainWindow::addOperationsInDB(QString nameDatabase)                                    //Добавление в таблицу БД
+bool MainWindow::addOperationsInDB()                                                        //Добавление в таблицу БД
 {
+    QString pathFileOperations = QFileDialog::getOpenFileName(this,"Выберите файл операций",QString(QApplication::applicationDirPath()+"\\Циклограмма"));
+    QString pathFileKPI = QFileDialog::getOpenFileName(this,"Выберите файл КПИ",QString(QApplication::applicationDirPath()+"\\Циклограмма"));
     QStringList temporary;
-    if(!db->outputFromTable(nameDatabase,"Operations",&temporary))                          //Если не удалось считать данные из БД
+    QStringList columns;
+    if(!pathFileOperations.isEmpty())
     {
-        QMessageBox::warning(this,"Ошибка при считывании","Не удалось записать данные в таблицу Operations");
+        if(!pathFileKPI.isEmpty())
+        {
+            columns.push_back("numberSession");
+            columns.push_back("date");
+            columns.push_back("pathFileOperations");
+            columns.push_back("pathFileKPI");
+            temporary.push_back(ui->number->currentText());
+            temporary.push_back(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+            temporary.push_back(pathFileOperations);
+            temporary.push_back(pathFileKPI);
+            if(!db->insertTable("DataSource",columns,temporary))
+            {
+                QMessageBox::warning(this,"Ошибка","Не удалось записать \nданные в базу данных");
+            }
+            return true;
+        }
+        else
+            QMessageBox::warning(this,"Ошибка","Файл КПИ не выбран");
     }
     else
-    {
-        int n = 0;
-        for(int i=0; i<temporary.count();i++)
-        {
-            if(i == temporary.count() - 1)
-            {
-                n = temporary.at(i).split(",").at(0).toInt() + 1;                           //Устанавливаем последний id из БД
-            }
-        }
-        int i=0;
-        temporary.clear();
-        foreach(Operation *ops, scene->getOperations())
-        {
-            temporary.push_back(QString::number(n+i));
-            temporary.push_back(ops->name);
-            temporary.push_back(ops->reduction);
-            temporary.push_back(QString::number(ops->width/Operation::getCoef()));
-            temporary.push_back(QString::number(ops->interval/Operation::getCoef()));
-            temporary.push_back(QString::number(ops->dynamic));
-            temporary.push_back(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-            if(!db->insertTable("Operations",temporary))                                    //Если не удалось записать данные в БД
-            {
-                QMessageBox::warning(this,"Ошибка при записи","Не удалось записать данные в таблицу Operations");
-                break;
-            }
-            temporary.clear();
-            i++;
-        }
-        return true;
-    }
+        QMessageBox::warning(this,"Ошибка","Файл с операциями не выбран");
     return false;
 }
 
@@ -152,15 +143,18 @@ void MainWindow::on_connectDB_clicked()                                         
                         else
                         {
                             QStringList data;
-                            if(db->outputFromTable("Cyclogram","Operations",&data))                                 //Если удалось считать данные из БД
-                            {
-                               QStringList line;
+                            QStringList columns;
+                            QStringList tables;
+                            tables.push_back("Operations");
+                            tables.push_back("MoscowTime");
+                            columns.push_back("Date");
+                            if(db->outputFromTable(tables,columns,"WHERE \"Operations\".\"DateId\" = \"MoscowTime\".id",&data))
+                            {                                                               //Если удалось считать данные из БД
                                ui->DateTimeOutBD->clear();
                                foreach(QString str, data)
                                {
-                                   line = str.split(',');
-                                   if(ui->DateTimeOutBD->findText(line.at(6)) == -1)
-                                        ui->DateTimeOutBD->addItem(line.at(6));
+                                   if(ui->DateTimeOutBD->findText(str) == -1)
+                                        ui->DateTimeOutBD->addItem(str);
                                }
                             }
                             ui->connectDB->setText("Отключиться от БД");
@@ -181,19 +175,22 @@ void MainWindow::on_InputDB_clicked()                                           
     {
         if(!scene->getOperations().isEmpty())                                               //Если на сцене есть операции
         {
-            if(addOperationsInDB(ui->NameDB->text()))
+            if(addOperationsInDB())
             {
                 QMessageBox::information(this,"Запись","Данные успешно записаны");
                 QStringList data;
-                if(db->outputFromTable("Cyclogram","Operations",&data))                     //Если удалось считать данные из БД
-                {
-                   QStringList line;
+                QStringList columns;
+                QStringList tables;
+                tables.push_back("Operations");
+                tables.push_back("MoscowTime");
+                columns.push_back("Date");
+                if(db->outputFromTable(tables,columns,"WHERE \"Operations\".\"DateId\" = \"MoscowTime\".id",&data))
+                {                                                               //Если удалось считать данные из БД
                    ui->DateTimeOutBD->clear();
                    foreach(QString str, data)
                    {
-                       line = str.split(',');
-                       if(ui->DateTimeOutBD->findText(line.at(6)) == -1)
-                            ui->DateTimeOutBD->addItem(line.at(6));
+                       if(ui->DateTimeOutBD->findText(str) == -1)
+                            ui->DateTimeOutBD->addItem(str);
                    }
                 }
             }
@@ -208,7 +205,18 @@ void MainWindow::on_OutputDB_clicked()                                          
     if(db->isOpen)                                                                          //Если соединение установлено
     {
         QStringList data;
-        if(db->outputFromTable("Cyclogram","Operations",&data))                             //Если удалось считать данные из БД
+        QStringList columns;
+        QStringList tables;
+        tables.push_back("Operations");
+        tables.push_back("MoscowTime");
+        columns.push_back("id");
+        columns.push_back("Name");
+        columns.push_back("Reduction");
+        columns.push_back("Width");
+        columns.push_back("Interval");
+        columns.push_back("Dynamic");
+        columns.push_back("Date");
+        if(db->outputFromTable(tables,columns,"WHERE \"Operations\".\"DateId\" = \"MoscowTime\".id",&data))                                    //Если удалось считать данные из БД
         {
             QStringList line;
             scene->allClear();
@@ -229,8 +237,6 @@ void MainWindow::on_OutputDB_clicked()                                          
                         scene->addOperations(line.at(1),line.at(2),line.at(3).toDouble(),line.at(4).toDouble(),false);
                     }
                     window->completionCombobox(scene->getNamesOperations());
-                    if(scene->getNamesOperations().contains("Запись информации"))
-                        window->afterAdd("Запись информации");
                     if(scene->getNamesOperations().contains("Воспроизведение информации"))
                         window->afterAdd("Воспроизведение информации");
                 }
@@ -257,8 +263,6 @@ void MainWindow::addOperation(QString name, QString reduction, double widthOpera
     if(scene->addOperations(name,reduction,widthOperation,intervalOperations,dynamic))
     {                                                                                       //Если удалось добавить операцию
         window->completionCombobox(scene->getNamesOperations());
-        if(scene->getNamesOperations().contains("Запись информации"))
-            window->afterAdd("Запись информации");
         if(scene->getNamesOperations().contains("Воспроизведение информации"))
             window->afterAdd("Воспроизведение информации");
     }
@@ -296,22 +300,20 @@ void MainWindow::on_InputFile_clicked()                                         
     QDir dir;
     dir.mkdir(QApplication::applicationDirPath()+"\\Циклограмма");
     QString path;
-    if(scene->getNamesOperations().indexOf("Запись информации") != -1)
+    if(!scene->getOperations().isEmpty())                                                   //Если сцена не пустая
     {
-        path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),"Запись информации",QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
-                                                                                            //Получаем путь к файлу
-    }
-    else
-    {
-        if(scene->getNamesOperations().indexOf("Воспроизведение информации") != -1)
-            path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),"Воспроизведение информации",QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
-                                                                                                //Получаем путь к файлу
+        if(scene->getNamesOperations().indexOf("Запись информации") != -1 && scene->getNamesOperations().indexOf("Воспроизведение информации") != -1)
+        {
+            path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),"Запись + воспроизведение информации",QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
+        }
         else
-            path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма"),tr("*.json"));
-    }
-    if(!path.isEmpty())                                                                     //Если путь к файлу не пустой
-    {
-        if(!scene->getOperations().isEmpty())                                               //Если сцена не пустая
+        {
+            if(scene->getNamesOperations().indexOf("Воспроизведение информации") != -1)
+                path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),"Воспроизведение информации",QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
+            else
+                path = QFileDialog::getSaveFileName(this,"Выберите файл",QString(QApplication::applicationDirPath()+"\\Циклограмма\\Сеанс №%1 %2 %3").arg(ui->number->currentText(),"Запись информации",QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss")),tr("*.json"));
+        }
+        if(!path.isEmpty())                                                                 //Если путь к файлу не пустой
         {
             setWindowTitle("Разработка циклограммы "+path.split('/').back());
             if(!fileInOut->inputJSONFile(scene->getOperations(),path))                      //Если не удалось записать в файл
@@ -320,14 +322,15 @@ void MainWindow::on_InputFile_clicked()                                         
             }
             else
             {
-                QMessageBox::information(this,"Запись","Данные успешно записаны");
+                if(fileInOut->inputFile(scene->getOperations(),path.replace(".json",".txt")))
+                    QMessageBox::information(this,"Запись","Данные успешно записаны");
             }
         }
         else
-             QMessageBox::warning(this,"Ошибка","Сцена пустая");
+            QMessageBox::warning(this,"Путь к файлу","Путь к файлу указан неверно");
     }
     else
-        QMessageBox::warning(this,"Путь к файлу","Путь к файлу указан неверно");
+         QMessageBox::warning(this,"Ошибка","Сцена пустая");
 }
 
 bool MainWindow::OutputFile()                                                               //Слот для считывания данных из файла
@@ -350,8 +353,6 @@ bool MainWindow::OutputFile()                                                   
                                                                                             //Добавляем на сцену
             }
             window->completionCombobox(scene->getNamesOperations());
-            if(scene->getNamesOperations().contains("Запись информации"))
-                window->afterAdd("Запись информации");
             if(scene->getNamesOperations().contains("Воспроизведение информации"))
                 window->afterAdd("Воспроизведение информации");
             scene->createQueue();

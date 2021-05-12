@@ -27,13 +27,26 @@ void DataBase::closeConnection()                                                
     isOpen = false;
     QSqlDatabase::removeDatabase("qt_sql_default_connection");                                                                                                          //Убираем соединение
 }
-bool DataBase::insertTable(QString nameTable, QStringList value)                                                                                                       //Метод для добавления данных в БД
+bool DataBase::insertTable(QString nameTable, QStringList columns, QStringList value)                                                                                   //Метод для добавления данных в БД
 {
     if(isOpen)
     {
-        QSqlQuery query;                                                                                                                                               //Создаём запрос
+        QSqlQuery query;                                                                                                                                                //Создаём запрос
         QString textQuery;
+        QString textColumns;
         int i = 0;
+        if(!columns.empty())
+        {
+            foreach(QString str, columns)
+            {
+                if(i != columns.count() - 1)
+                    textColumns += QString("\"%1\",").arg(str);
+                else
+                    textColumns += QString("\"%1\"").arg(str);
+                i++;
+            }
+        i=0;
+        }
         foreach(QString str, value)
         {
             if(i != value.count() - 1)
@@ -42,7 +55,7 @@ bool DataBase::insertTable(QString nameTable, QStringList value)                
                 textQuery += QString("'%1'").arg(str);
             i++;
         }
-        if(query.exec(QString("INSERT INTO \"%1\" VALUES(%2)").arg(nameTable,textQuery)))                                                                              //Выполняем запрос
+        if(query.exec(QString("INSERT INTO \"%1\"(%2) VALUES(%3)").arg(nameTable,textColumns,textQuery)))                                                               //Выполняем запрос
         {
             return true;
         }
@@ -74,30 +87,48 @@ bool DataBase::deleteRow(QString nameTable,QString nameColumn, QString index, QS
     }
     return false;
 }
-bool DataBase::outputFromTable(QString nameDatabase, QString nameTable, QStringList *result)
+bool DataBase::outputFromTable(QStringList nameTable, QStringList columns, QString condition, QStringList *result)
 {
     if(isOpen)
     {
-        QSqlQuery query;                                                                                                                                                //Создаём запрос
-        query.exec(QString("SELECT COUNT(data_type) FROM information_schema.columns WHERE table_catalog = '%1' AND table_name = '%2'").arg(nameDatabase,nameTable));    //Выполняем запрос
-        query.next();
-        int n = query.value(0).toInt();                                                                                                                                 //Получаем значение
+        QSqlQuery query;                                                                                                                                                //Создаём запрос                                                                                                                                //Получаем значение
         QString column;
-        if(query.exec(QString("SELECT * FROM \"%1\" ").arg(nameTable)))                                                                                                 //Выполняем запрос
+        QString tables;
+        QString value;
+        int i=0;
+        foreach(QString str, columns)
+        {
+            if(i != columns.count() - 1)
+                column += QString("\"%1\",").arg(str);
+            else
+                column += QString("\"%1\"").arg(str);
+            i++;
+        }
+        i=0;
+        foreach(QString str, nameTable)
+        {
+            if(i != nameTable.count() - 1)
+                tables += QString("\"%1\",").arg(str);
+            else
+                tables += QString("\"%1\"").arg(str);
+            i++;
+        }
+        if(query.exec(QString("SELECT %1 FROM %2 %3").arg(column, tables, condition)))                                                                                                 //Выполняем запрос
         {
             while (query.next()) {
-                for(int i = 0; i < n; i++)
+                for(int i = 0; i < columns.count(); i++)
                 {
-                    if(i != n-1)
-                        column += query.value(i).toString()+",";                                                                                                        //Получаем значение
+                    if(i != columns.count()-1)
+                        value += query.value(i).toString()+",";                                                                                                        //Получаем значение
                     else
-                        column += query.value(i).toString();                                                                                                            //Получаем значение
+                        value += query.value(i).toString();                                                                                                            //Получаем значение
                 }
-                result->push_back(column);
-                column="";
+                result->push_back(value);
+                value="";
             }
             return true;
         }
+        qDebug()<<query.lastError().text();
     }
     return false;
 }

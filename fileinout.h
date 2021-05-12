@@ -14,6 +14,7 @@ public:
     FileInOut();
     ~FileInOut();
     bool inputJSONFile(QVector<Operation*> operations,QString path);                    //Запись в JSON файл
+    bool inputFile(QVector<Operation*> operations,QString path);
     bool outputJSONFile(QString path,QVector<Geometry> *vectorGeom);                    //Считывание из JSON файла
     bool outputNamesOperation(QString path, QVector<Geometry> *vectorGeom);
 };

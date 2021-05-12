@@ -11,19 +11,27 @@ void Test_Database::connection()                                                
 void Test_Database::insertTable()                                                       //Слот для проверки вставки данных в БД
 {
     QStringList columns;
-    columns.push_back("1");
-    columns.push_back("Ivan");
-    QCOMPARE(database.insertTable("ExampleTable",columns),true);                        //Сравниваем актуальное значение с фактическим
-    insertValue.push_back(QString("%1,%2").arg(columns.at(0),columns.at(1)));
+    columns.push_back("id");
+    columns.push_back("firstname");
+    QStringList value;
+    value.push_back("1");
+    value.push_back("Ivan");
+    QCOMPARE(database.insertTable("ExampleTable",columns,value),true);                  //Сравниваем актуальное значение с фактическим
+    insertValue.push_back(QString("%1,%2").arg(value.at(0),value.at(1)));
 }
 void Test_Database::outputFromTable()                                                   //Слот для проверки считывания данных из БД
 {
-    database.outputFromTable("Example","ExampleTable",&outputValue);
+    QStringList columns;
+    QStringList tables;
+    tables.push_back("ExampleTable");
+    columns.push_back("id");
+    columns.push_back("firstname");
+    database.outputFromTable(tables,columns,"",&outputValue);
     QCOMPARE(insertValue,outputValue);                                                  //Сравниваем актуальное значение с фактическим
 }
 void Test_Database::updateTable()                                                       //Слот для проверки обновления таблиц в БД
 {
-    QCOMPARE(database.updateTable("ExampleTable","name","Ivan","Petr"),true);      //Сравниваем актуальное значение с фактическим
+    QCOMPARE(database.updateTable("ExampleTable","name","Ivan","Petr"),true);           //Сравниваем актуальное значение с фактическим
 }
 void Test_Database::deleteRow()                                                         //Слот для проверки удаления строки из БД
 {

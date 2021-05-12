@@ -20,10 +20,12 @@ public:
     void showAction(QString nameAction);
     void afterAdd(QString nameOperation);
     bool afterDelete();
+    void forAdd();
 private:
     Ui::Action *ui;
     FileInOut *file = nullptr;
     QVector<Geometry> *operations = nullptr;
+    QVector<Geometry> *operations1 = nullptr;
 
 signals:
     void signalAddOperation(QString name, QString reduction, double widthOperation, double intervalOperations, bool dynamic);
