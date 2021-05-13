@@ -71,9 +71,16 @@ void Operation::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     }
     else
     {
-        painter->rotate(-90);
-        painter->drawText(-rect.topLeft().y()+10,interval-5,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
-        painter->rotate(90);
+        if(this->reduction.length() > 3)
+        {
+            painter->rotate(-90);
+            painter->drawText(-rect.topLeft().y()+53,interval-5,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
+            painter->rotate(90);
+        }
+        else
+        {
+            painter->drawText(interval,rect.topLeft().y()-70,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
+        }
     }
     if(dynamic)
     {

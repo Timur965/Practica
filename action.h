@@ -25,7 +25,7 @@ private:
     Ui::Action *ui;
     FileInOut *file = nullptr;
     QVector<Geometry> *operations = nullptr;
-    QVector<Geometry> *operations1 = nullptr;
+    QVector<Geometry> *allOperations = nullptr;
 
 signals:
     void signalAddOperation(QString name, QString reduction, double widthOperation, double intervalOperations, bool dynamic);

@@ -10,7 +10,7 @@ Action::Action(QWidget *parent) :
     if(operations == nullptr)
     {
         operations = new QVector<Geometry>();
-        operations1 = new QVector<Geometry>();
+        allOperations = new QVector<Geometry>();
         file = new FileInOut();
         if(!afterDelete())
             QMessageBox::warning(this,"Ошибка","Не удалось считать названия операций");
@@ -27,6 +27,8 @@ Action::~Action()
         delete file;
     if(operations != nullptr)
         delete operations;
+    if(allOperations != nullptr)
+        delete allOperations;
 }
 void Action::completionCombobox(QVector<QString> data)
 {
@@ -147,7 +149,7 @@ void Action::on_AddOperation_clicked()
             op.width = ui->operationWidth->text().toDouble();
             op.interval = ui->operationInterval->text().toDouble();
             op.dynamic = dynamic;
-            operations1->push_back(op);
+            allOperations->push_back(op);
             emit signalAddOperation(ui->nameOperations->currentText(),operations->at(index).reduction,ui->operationWidth->text().toDouble(),ui->operationInterval->text().toDouble(),dynamic);
         }
         else
@@ -174,7 +176,7 @@ void Action::on_UpdateOperation_clicked()
             {
                 int index = -1;
                 int i = 0;
-                foreach(Geometry ops, *operations1)
+                foreach(Geometry ops, *allOperations)
                 {
                     if(ops.name == ui->comboBox->currentText())
                     {
@@ -182,7 +184,7 @@ void Action::on_UpdateOperation_clicked()
                     }
                     i++;
                 }
-                emit signalUpdateOperation(ui->comboBox->currentIndex(),ui->comboBox->currentText(),operations1->at(index).reduction,ui->operationWidth_2->text().toDouble(),ui->operationInterval_2->text().toDouble());
+                emit signalUpdateOperation(ui->comboBox->currentIndex(),ui->comboBox->currentText(),allOperations->at(index).reduction,ui->operationWidth_2->text().toDouble(),ui->operationInterval_2->text().toDouble());
             }
             else QMessageBox::warning(this,"Неккоректные данные","Выберите операцию для изменения");
         }
@@ -198,7 +200,7 @@ void Action::on_DeleteOperation_clicked()
         int index = ui->comboBox_2->currentIndex();
         ui->comboBox->removeItem(index);
         ui->comboBox_2->removeItem(index);
-        operations1->removeAt(index);
+        allOperations->removeAt(index);
         emit signalDeleteOperation(index);
     }
     else
@@ -244,7 +246,7 @@ void Action::on_comboBox_4_currentIndexChanged(int index)
 
 void Action::on_comboBox_currentIndexChanged(const QString &arg1)
 {
-    foreach(Geometry ops, *operations1)
+    foreach(Geometry ops, *allOperations)
     {
         if(arg1.contains(ops.name))
         {
