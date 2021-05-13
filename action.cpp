@@ -125,18 +125,30 @@ void Action::on_AddOperation_clicked()
             }
             Geometry op;
             static int id = 0;
-            if(id == 0)
-                op.name = ui->nameOperations->currentText();
+            if(operations->at(index).reduction.contains("ЗИ"))
+            {
+                if(id == 0)
+                {
+                    op.name = ui->nameOperations->currentText();
+                    op.reduction = operations->at(index).reduction;
+                }
+                else
+                {
+                    op.name = ui->nameOperations->currentText()+QString::number(id);
+                    op.reduction = operations->at(index).reduction+QString::number(id);
+                }
+                id++;
+            }
             else
-                op.name = ui->nameOperations->currentText()+QString::number(id);
-            op.reduction = operations->at(index).reduction;
+            {
+                op.name = ui->nameOperations->currentText();
+                op.reduction = operations->at(index).reduction;
+            }
             op.width = ui->operationWidth->text().toDouble();
             op.interval = ui->operationInterval->text().toDouble();
             op.dynamic = dynamic;
             operations1->push_back(op);
             emit signalAddOperation(ui->nameOperations->currentText(),operations->at(index).reduction,ui->operationWidth->text().toDouble(),ui->operationInterval->text().toDouble(),dynamic);
-            if(operations->at(index).reduction.contains("ЗИ"))
-                id++;
         }
         else
         {

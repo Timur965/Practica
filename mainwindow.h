@@ -42,7 +42,6 @@ private slots:
     void updateDecreaseView();                                              //Слот для уменьшения представления
     void updateSizeView();
     void on_InputDB_clicked();                                              //Слот для записи данных в БД
-    void on_OutputDB_clicked();                                             //Слот для считывания данных из БД
     void on_AddOperation_clicked();                                         //Слот для добавления операции на сцену
     void on_UpdateOperation_clicked();                                      //Слот для обновлении операции на сцене
     void on_DeleteOperation_clicked();                                      //Слот для удаления операции со сцены

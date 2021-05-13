@@ -34,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->InputFile->setEnabled(false);
     ui->connectDB->setEnabled(false);
     ui->InputDB->setEnabled(false);
-    ui->OutputDB->setEnabled(false);
 
     for(int i=1;i<=10;i++)
     {
@@ -132,7 +131,6 @@ void MainWindow::on_connectDB_clicked()                                         
                     {
                         db->closeConnection();
                         ui->connectDB->setText("Подключиться к БД");
-                        ui->DateTimeOutBD->clear();
                     }
                     else                                                                    //Если соединение не установлено
                     {
@@ -142,21 +140,6 @@ void MainWindow::on_connectDB_clicked()                                         
                         }
                         else
                         {
-                            QStringList data;
-                            QStringList columns;
-                            QStringList tables;
-                            tables.push_back("Operations");
-                            tables.push_back("MoscowTime");
-                            columns.push_back("Date");
-                            if(db->outputFromTable(tables,columns,"WHERE \"Operations\".\"DateId\" = \"MoscowTime\".id",&data))
-                            {                                                               //Если удалось считать данные из БД
-                               ui->DateTimeOutBD->clear();
-                               foreach(QString str, data)
-                               {
-                                   if(ui->DateTimeOutBD->findText(str) == -1)
-                                        ui->DateTimeOutBD->addItem(str);
-                               }
-                            }
                             ui->connectDB->setText("Отключиться от БД");
                         }
                     }
@@ -178,74 +161,11 @@ void MainWindow::on_InputDB_clicked()                                           
             if(addOperationsInDB())
             {
                 QMessageBox::information(this,"Запись","Данные успешно записаны");
-                QStringList data;
-                QStringList columns;
-                QStringList tables;
-                tables.push_back("Operations");
-                tables.push_back("MoscowTime");
-                columns.push_back("Date");
-                if(db->outputFromTable(tables,columns,"WHERE \"Operations\".\"DateId\" = \"MoscowTime\".id",&data))
-                {                                                               //Если удалось считать данные из БД
-                   ui->DateTimeOutBD->clear();
-                   foreach(QString str, data)
-                   {
-                       if(ui->DateTimeOutBD->findText(str) == -1)
-                            ui->DateTimeOutBD->addItem(str);
-                   }
-                }
             }
         }
         else QMessageBox::warning(this,"Ошибка","Добавьте операцию на сцену");
     }
     else QMessageBox::warning(this,"Ошибка","Не удалось записать данные в БД");
-}
-
-void MainWindow::on_OutputDB_clicked()                                                      //Слот для считывания данных из БД
-{
-    if(db->isOpen)                                                                          //Если соединение установлено
-    {
-        QStringList data;
-        QStringList columns;
-        QStringList tables;
-        tables.push_back("Operations");
-        tables.push_back("MoscowTime");
-        columns.push_back("id");
-        columns.push_back("Name");
-        columns.push_back("Reduction");
-        columns.push_back("Width");
-        columns.push_back("Interval");
-        columns.push_back("Dynamic");
-        columns.push_back("Date");
-        if(db->outputFromTable(tables,columns,"WHERE \"Operations\".\"DateId\" = \"MoscowTime\".id",&data))                                    //Если удалось считать данные из БД
-        {
-            QStringList line;
-            scene->allClear();
-            window->afterDelete();
-            ui->graphicsView->setMinimumWidth(0);
-            ui->graphicsView->setMaximumWidth(925);
-            foreach(QString str, data)
-            {
-                line = str.split(',');
-                if(line.at(6) == ui->DateTimeOutBD->currentText())                          //Если считываемая дата равна выбранной
-                {
-                    if(line.at(5) == "true")                                                //Если считываемый dynamic = true
-                    {
-                        scene->addOperations(line.at(1),line.at(2),line.at(3).toDouble(),line.at(4).toDouble(),true);
-                    }
-                    else
-                    {
-                        scene->addOperations(line.at(1),line.at(2),line.at(3).toDouble(),line.at(4).toDouble(),false);
-                    }
-                    window->completionCombobox(scene->getNamesOperations());
-                    if(scene->getNamesOperations().contains("Воспроизведение информации"))
-                        window->afterAdd("Воспроизведение информации");
-                }
-                line.clear();
-            }
-        }
-        else QMessageBox::warning(this,"Ошибка","Не удалось считать данные из БД");
-    }
-    else QMessageBox::warning(this,"Ошибка","Не удалось подключиться БД");
 }
 void MainWindow::selectingAction(QString nameAction)
 {
@@ -375,7 +295,6 @@ void MainWindow::on_createCyclogram_triggered()
     ui->InputFile->setEnabled(true);
     ui->connectDB->setEnabled(true);
     ui->InputDB->setEnabled(true);
-    ui->OutputDB->setEnabled(true);
     scene->allClear();
     window->afterDelete();
     updateSizeView();
@@ -393,7 +312,6 @@ void MainWindow::on_updateCyclogram_triggered()
         ui->InputFile->setEnabled(true);
         ui->connectDB->setEnabled(true);
         ui->InputDB->setEnabled(true);
-        ui->OutputDB->setEnabled(true);
     }
     scene->update();
 }
@@ -409,7 +327,6 @@ void MainWindow::on_showCyclogram_triggered()
         ui->InputFile->setEnabled(false);
         ui->connectDB->setEnabled(false);
         ui->InputDB->setEnabled(false);
-        ui->OutputDB->setEnabled(false);
     }
     scene->update();
 }

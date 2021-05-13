@@ -1,7 +1,7 @@
 #include "operation.h"
 
 int Operation::id = 0;
-int Operation::coef = 60;
+int Operation::coef = 30;
 Operation::Operation(QString name, QString reduction, double width, double interval, bool dynamic)
 {
     if(!reduction.contains("ЗИ") || (reduction.contains("ЗИ") && id == 0))
@@ -71,7 +71,9 @@ void Operation::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     }
     else
     {
-        painter->drawText(interval,rect.topLeft().y()-70,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
+        painter->rotate(-90);
+        painter->drawText(-rect.topLeft().y()+10,interval-5,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
+        painter->rotate(90);
     }
     if(dynamic)
     {
