@@ -20,7 +20,6 @@ public:
     void showAction(QString nameAction);
     void afterAdd(QString nameOperation);
     bool afterDelete();
-    void forAdd();
     void completionAllOperations(Geometry geom);
     static int id;
 private:

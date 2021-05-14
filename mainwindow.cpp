@@ -105,7 +105,8 @@ bool MainWindow::addOperationsInDB()                                            
             {
                 QMessageBox::warning(this,"Ошибка","Не удалось записать \nданные в базу данных");
             }
-            return true;
+            else
+                return true;
         }
         else
             QMessageBox::warning(this,"Ошибка","Файл КПИ не выбран");
@@ -129,6 +130,10 @@ void MainWindow::on_connectDB_clicked()                                         
                 {
                     if(db->isOpen)                                                          //Если соединение установлено
                     {
+                        ui->LoginDB->setEnabled(true);
+                        ui->PasswordDB->setEnabled(true);
+                        ui->HostDB->setEnabled(true);
+                        ui->NameDB->setEnabled(true);
                         db->closeConnection();
                         ui->connectDB->setText("Подключиться к БД");
                     }
@@ -140,6 +145,10 @@ void MainWindow::on_connectDB_clicked()                                         
                         }
                         else
                         {
+                            ui->LoginDB->setEnabled(false);
+                            ui->PasswordDB->setEnabled(false);
+                            ui->HostDB->setEnabled(false);
+                            ui->NameDB->setEnabled(false);
                             ui->connectDB->setText("Отключиться от БД");
                         }
                     }

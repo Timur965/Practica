@@ -17,17 +17,6 @@ void Test_Database::insertTable()                                               
     value.push_back("1");
     value.push_back("Ivan");
     QCOMPARE(database.insertTable("ExampleTable",columns,value),true);                  //Сравниваем актуальное значение с фактическим
-    insertValue.push_back(QString("%1,%2").arg(value.at(0),value.at(1)));
-}
-void Test_Database::outputFromTable()                                                   //Слот для проверки считывания данных из БД
-{
-    QStringList columns;
-    QStringList tables;
-    tables.push_back("ExampleTable");
-    columns.push_back("id");
-    columns.push_back("firstname");
-    database.outputFromTable(tables,columns,"",&outputValue);
-    QCOMPARE(insertValue,outputValue);                                                  //Сравниваем актуальное значение с фактическим
 }
 void Test_Database::updateTable()                                                       //Слот для проверки обновления таблиц в БД
 {

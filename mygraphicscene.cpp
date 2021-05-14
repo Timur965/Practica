@@ -177,7 +177,7 @@ void MyGraphicScene::processingRelease()                                        
         if(ops->dynamic)
             x = x + ops->width + ops->interval;
         else
-            x = x + ops->width + ops->interval - 1;
+            x = x + ops->interval;
     }
     if((x < 925/2+59 || operations.empty()) && oldWidth.empty())
     {
