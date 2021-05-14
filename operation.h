@@ -22,7 +22,6 @@ public:
     void setSceneSize(double widthView, double heightView);                                   //Метод для передачи размеров сцены
     void setCoordStart(int coord);                                                            //Метод для получения координаты начала операции
     static int getCoef();                                                                     //Метод для получения коэффицента ширины операции
-    static int getId();                                                                       //Метод для получения id операции
     double width;
     double start=0;                                                                           //Начало операции
     double end=0;                                                                             //Конец операции
@@ -32,7 +31,6 @@ public:
     QString name;
     QString reduction;
 private:
-    static int id;
     bool hover=false;                                                                         //Переменная указывающая наведен ли курсор на операцию
     double sceneWidth=0;                                                                      //Ширина сцены
     double sceneHeight=0;                                                                     //Высота сцены

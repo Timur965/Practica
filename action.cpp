@@ -43,6 +43,8 @@ void Action::completionCombobox(QVector<QString> data)
 }
 void Action::completionAllOperations(Geometry geom)
 {
+    if(geom.reduction.contains("ЗИ"))
+        id++;
     allOperations->push_back(geom);
 }
 void Action::showAction(QString nameAction)
@@ -214,6 +216,7 @@ void Action::on_DeleteOperation_clicked()
             ui->comboBox->removeItem(index);
             ui->comboBox_2->removeItem(index);
             allOperations->removeAt(index);
+            id--;
             emit signalDeleteOperation(index);
         }
         else

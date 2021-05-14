@@ -1,12 +1,10 @@
 #include "operation.h"
 
-int Operation::id = 0;
 int Operation::coef = 30;
 Operation::Operation(QString name, QString reduction, double width, double interval, bool dynamic)
 {
-        this->name = name;
-        this->reduction = reduction;
-
+    this->name = name;
+    this->reduction = reduction;
     if(!dynamic)
     {
         this->width=1;
@@ -82,10 +80,6 @@ void Operation::setCoordStart(int coord)                                        
 int Operation::getCoef()                                                                                                                               //Метод для получения коэффицента ширины операции
 {
     return coef;
-}
-int Operation::getId()                                                                                                                               //Метод для получения коэффицента ширины операции
-{
-    return id;
 }
 void Operation::transformOperation(QString name, QString reduction, double width, double interval)                                                     //Изменение операции
 {

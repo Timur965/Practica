@@ -40,15 +40,17 @@ void MyGraphicScene::allClear()
 bool MyGraphicScene::checkName(QString name)
 {
     bool oldName=false;
+    QString temporaryName = name;
     foreach(Operation *ops, operations)
     {
-        if(name == ops->name)
+        if(name.contains(ops->name))
         {
             oldName = true;
             break;
         }
     }
-    if(name.contains("Запись информации") && Operation::getId() <= 10)
+    int count = temporaryName.remove(0,temporaryName.indexOf(QRegExp("\\d"))).toInt();
+    if(name.contains("Запись информации") && count <= 10)
     {
         oldName = false;
     }
@@ -82,6 +84,10 @@ bool MyGraphicScene::deleteOperations(int index)                                
 {
     this->removeItem(operations.at(index));                                                                                  //Удаленяем операцию со сцены
     operations.remove(index);                                                                                                //Удаляем указатель на операцию из вектора
+    if(operations.empty())
+    {
+        this->allClear();
+    }
     this->createQueue();
     this->processingRelease();
     this->update();                                                                                                          //Обновляем сцену
@@ -136,7 +142,7 @@ void MyGraphicScene::createQueue(int coord, int coordHeight)                    
                 if(ops->dynamic)
                     x = x + ops->width + ops->interval;
                 else
-                    x = x + ops->width + ops->interval - 1;
+                    x = x + ops->interval;
             }
             else
             {

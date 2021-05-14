@@ -186,7 +186,7 @@ void MainWindow::addOperation(QString name, QString reduction, double widthOpera
         if(scene->getNamesOperations().contains("Воспроизведение информации"))
             window->afterAdd("Воспроизведение информации");
     }
-    else QMessageBox::warning(this,"Добавление","Имя занято.");
+    else QMessageBox::warning(this,"Добавление","Имя занято");
 }
 void MainWindow::on_UpdateOperation_clicked()                                               //Слот для обновления операций
 {
@@ -198,7 +198,7 @@ void MainWindow::updateOperation(int index, QString name, QString reduction, dou
     {
         window->completionCombobox(scene->getNamesOperations());
     }
-    else QMessageBox::warning(this,"Изменение","Имя занято.");
+    else QMessageBox::warning(this,"Изменение","Имя занято");
 }
 void MainWindow::on_DeleteOperation_clicked()                                               //Слот для удаления операций
 {
@@ -211,8 +211,10 @@ void MainWindow::deleteOperation(int index)
         window->completionCombobox(scene->getNamesOperations());
         if(!scene->getNamesOperations().contains("Запись информации")|| !scene->getNamesOperations().contains("Воспроизведение информации"))
             window->afterDelete();
+        if(scene->getNamesOperations().empty())
+            window->id=0;
     }
-    else QMessageBox::warning(this,"Удаление","Не получилось удалить.");
+    else QMessageBox::warning(this,"Удаление","Не получилось удалить");
 
 }
 void MainWindow::on_InputFile_clicked()                                                     //Слот для записи данных в файл
