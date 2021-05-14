@@ -265,12 +265,14 @@ bool MainWindow::OutputFile()                                                   
             setWindowTitle("Разработка циклограммы "+path.split('/').back());
             scene->allClear();
             window->afterDelete();
+            window->id = 0;
             ui->graphicsView->setMinimumWidth(0);
             ui->graphicsView->setMaximumWidth(925);
             foreach(Geometry geom, *vectorGeometry)
             {
                 scene->addOperations(geom.name,geom.reduction,geom.width,geom.interval,geom.dynamic);
                                                                                             //Добавляем на сцену
+                window->completionAllOperations(geom);
             }
             window->completionCombobox(scene->getNamesOperations());
             if(scene->getNamesOperations().contains("Воспроизведение информации"))
@@ -297,6 +299,7 @@ void MainWindow::on_createCyclogram_triggered()
     ui->InputDB->setEnabled(true);
     scene->allClear();
     window->afterDelete();
+    window->id = 0;
     updateSizeView();
     scene->update();
 }

@@ -21,6 +21,8 @@ public:
     void afterAdd(QString nameOperation);
     bool afterDelete();
     void forAdd();
+    void completionAllOperations(Geometry geom);
+    static int id;
 private:
     Ui::Action *ui;
     FileInOut *file = nullptr;

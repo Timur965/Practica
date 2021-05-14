@@ -1,6 +1,7 @@
 #include "action.h"
 #include "ui_action.h"
 
+int Action::id = 0;
 Action::Action(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Action)
@@ -39,6 +40,10 @@ void Action::completionCombobox(QVector<QString> data)
         ui->comboBox->addItem(name);
         ui->comboBox_2->addItem(name);
     }
+}
+void Action::completionAllOperations(Geometry geom)
+{
+    allOperations->push_back(geom);
 }
 void Action::showAction(QString nameAction)
 {
@@ -126,7 +131,6 @@ void Action::on_AddOperation_clicked()
                 i++;
             }
             Geometry op;
-            static int id = 0;
             if(operations->at(index).reduction.contains("ЗИ"))
             {
                 if(id == 0)
@@ -150,11 +154,14 @@ void Action::on_AddOperation_clicked()
             op.interval = ui->operationInterval->text().toDouble();
             op.dynamic = dynamic;
             allOperations->push_back(op);
-            emit signalAddOperation(ui->nameOperations->currentText(),operations->at(index).reduction,ui->operationWidth->text().toDouble(),ui->operationInterval->text().toDouble(),dynamic);
+            if(index != -1)
+                emit signalAddOperation(op.name,op.reduction,op.width,op.interval,op.dynamic);
+            else
+                QMessageBox::warning(this,"Ошибка","Такой операции не существует");
         }
         else
         {
-                QMessageBox::warning(this,"Неккоректные данные","Вы ввели слишком большие или\n слишко малые координаты.");
+            QMessageBox::warning(this,"Неккоректные данные","Вы ввели слишком большие или\n слишко малые координаты.");
         }
     }
     else QMessageBox::warning(this,"Неккоректные данные","Вводить можно только цифры");
@@ -184,7 +191,11 @@ void Action::on_UpdateOperation_clicked()
                     }
                     i++;
                 }
-                emit signalUpdateOperation(ui->comboBox->currentIndex(),ui->comboBox->currentText(),allOperations->at(index).reduction,ui->operationWidth_2->text().toDouble(),ui->operationInterval_2->text().toDouble());
+                if(index != -1)
+                    emit signalUpdateOperation(ui->comboBox->currentIndex(),ui->comboBox->currentText(),allOperations->at(index).reduction,ui->operationWidth_2->text().toDouble(),ui->operationInterval_2->text().toDouble());
+                else
+                    QMessageBox::warning(this,"Ошибка","Такой операции не существует");
+
             }
             else QMessageBox::warning(this,"Неккоректные данные","Выберите операцию для изменения");
         }
@@ -198,10 +209,15 @@ void Action::on_DeleteOperation_clicked()
     if(ui->comboBox_2->count() != NULL)                                                       //Проверка если количество записей в combobox не равно 0
     {
         int index = ui->comboBox_2->currentIndex();
-        ui->comboBox->removeItem(index);
-        ui->comboBox_2->removeItem(index);
-        allOperations->removeAt(index);
-        emit signalDeleteOperation(index);
+        if(index != -1)
+        {
+            ui->comboBox->removeItem(index);
+            ui->comboBox_2->removeItem(index);
+            allOperations->removeAt(index);
+            emit signalDeleteOperation(index);
+        }
+        else
+            QMessageBox::warning(this,"Ошибка","Такой операции не существует");
     }
     else
     {

@@ -4,16 +4,8 @@ int Operation::id = 0;
 int Operation::coef = 30;
 Operation::Operation(QString name, QString reduction, double width, double interval, bool dynamic)
 {
-    if(!reduction.contains("ЗИ") || (reduction.contains("ЗИ") && id == 0))
-    {
         this->name = name;
         this->reduction = reduction;
-    }
-    else
-    {
-        this->name = name + QString::number(id);
-        this->reduction = reduction + QString::number(id);
-    }
 
     if(!dynamic)
     {
@@ -27,8 +19,6 @@ Operation::Operation(QString name, QString reduction, double width, double inter
     this->dynamic = dynamic;
     transformOperation(this->name,this->reduction,this->width,this->interval);
 
-    if(reduction.contains("ЗИ"))
-        id++;
     setFlag(QGraphicsItem::ItemIsFocusable);
     this->setAcceptHoverEvents(true);
 }
@@ -58,29 +48,17 @@ void Operation::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     }
     if(dynamic)
     {
-        painter->drawText(interval,rect.topLeft().y()-50,rect.width()+35,rect.height(),Qt::AlignLeft,"Тн"+reduction);                                   //Отрисовываем Тн
-        if(this->width > 75)
-            painter->drawText(interval,rect.topLeft().y()-50,rect.width(),rect.height(),Qt::AlignRight,"Тк"+reduction);                              //Отрисовываем Тк
-        else
-        {
-            if(this->width > 50 && this->width < 75)
-                painter->drawText(interval,rect.topLeft().y()-35,rect.width(),rect.height(),Qt::AlignRight,"Тк"+reduction);
-            else
-                painter->drawText(interval,rect.topLeft().y()-35,rect.width()+35,rect.height(),Qt::AlignRight,"Тк"+reduction);
-        }
+        painter->rotate(-90);
+        painter->drawText(rect.topLeft().y()+105,interval,rect.width()+35,rect.height(),Qt::AlignLeft,"Тн"+reduction);                                   //Отрисовываем Тн
+        painter->drawText(rect.topLeft().y()+105,interval+rect.width()-15,rect.width()+15,rect.height(),Qt::AlignLeft,"Тк"+reduction);                     //Отрисовываем Тк
+        painter->rotate(90);
     }
     else
     {
-        if(this->reduction.length() > 3)
-        {
-            painter->rotate(-90);
-            painter->drawText(-rect.topLeft().y()+53,interval-5,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
-            painter->rotate(90);
-        }
-        else
-        {
-            painter->drawText(interval,rect.topLeft().y()-70,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
-        }
+        painter->rotate(-90);
+        painter->drawText(-rect.topLeft().y()+53,interval-5,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
+        painter->rotate(90);
+        //painter->drawText(interval,rect.topLeft().y()-70,rect.width()+50,rect.height(),Qt::AlignLeft,reduction);
     }
     if(dynamic)
     {
