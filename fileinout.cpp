@@ -62,8 +62,8 @@ bool FileInOut::inputFile(QVector<Operation *> operations, QString path)
                 else
                     stream<<ops->start<<"\t-\t"<<ops->start<<"\t-\t"<<ops->reduction<<"\t-\t"<<transmissionСhannel<<"\n";
             }
-            return true;
             file1.close();
+            return true;
         }
     }
     return false;

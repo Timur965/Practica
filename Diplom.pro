@@ -9,7 +9,6 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Test/test_database.cpp \
     action.cpp \
     database.cpp \
     fileinout.cpp \
@@ -20,7 +19,6 @@ SOURCES += \
 
 HEADERS += \
     Structures.h \
-    Test/test_database.h \
     action.h \
     database.h \
     fileinout.h \

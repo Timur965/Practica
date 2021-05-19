@@ -63,27 +63,3 @@ bool DataBase::insertTable(QString nameTable, QStringList columns, QStringList v
     }
     return false;
 }
-bool DataBase::updateTable(QString nameTable, QString nameColumn, QString value, QString newValue)
-{
-    if(isOpen)
-    {
-        QSqlQuery query;                                                                                                                                                //Создаём запрос
-        if(query.exec(QString("UPDATE \"%1\" SET %2 = '%3' WHERE %4 = '%5'").arg(nameTable,nameColumn,newValue,nameColumn,value)))                                      //Выполняем запрос
-        {
-            return true;
-        }
-    }
-    return false;
-}
-bool DataBase::deleteRow(QString nameTable,QString nameColumn, QString index, QString sign)
-{
-    if(isOpen)
-    {
-        QSqlQuery query;                                                                                                                                                //Создаём запрос
-        if(query.exec(QString("DELETE FROM \"%1\" WHERE \"%2\" %3 %4").arg(nameTable,nameColumn,sign,index)))                                                           //Выполняем запрос
-        {
-            return true;
-        }
-    }
-    return false;
-}
