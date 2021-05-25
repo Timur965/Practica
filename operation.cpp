@@ -48,7 +48,7 @@ void Operation::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     {
         painter->rotate(-90);
         painter->drawText(rect.topLeft().y()+105,interval,rect.width()+35,rect.height(),Qt::AlignLeft,"Тн"+reduction);                                   //Отрисовываем Тн
-        painter->drawText(rect.topLeft().y()+105,interval+rect.width()-15,rect.width()+15,rect.height(),Qt::AlignLeft,"Тк"+reduction);                     //Отрисовываем Тк
+        painter->drawText(rect.topLeft().y()+105,interval+rect.width()-15,rect.width()+25,rect.height(),Qt::AlignLeft,"Тк"+reduction);                     //Отрисовываем Тк
         painter->rotate(90);
     }
     else

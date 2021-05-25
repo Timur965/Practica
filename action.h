@@ -36,8 +36,8 @@ private slots:
     void on_AddOperation_clicked();
     void on_UpdateOperation_clicked();
     void on_DeleteOperation_clicked();
-    void on_comboBox_4_currentIndexChanged(int index);
-    void on_comboBox_currentIndexChanged(const QString &arg1);
+    void choiceOperations(int index);
+    void showLineEdit(const QString &arg1);
 };
 
 #endif // ACTION_H

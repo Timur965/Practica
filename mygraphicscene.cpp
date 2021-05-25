@@ -50,7 +50,7 @@ bool MyGraphicScene::checkName(QString name)
         }
     }
     int count = temporaryName.remove(0,temporaryName.indexOf(QRegExp("\\d"))).toInt();
-    if(name.contains("Запись информации") && count <= 10)
+    if(name.contains("Запись информации") && count < 10)
     {
         oldName = false;
     }

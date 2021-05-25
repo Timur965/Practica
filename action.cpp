@@ -19,6 +19,8 @@ Action::Action(QWidget *parent) :
 
     ui->comboBox_4->addItem("Динамический");
     ui->comboBox_4->addItem("Разовая команда");
+    connect(ui->comboBox_4,SIGNAL(currentIndexChanged(int)),this,SLOT(choiceOperations(int)));
+    connect(ui->comboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(showLineEdit(QString)));
 }
 
 Action::~Action()
@@ -83,7 +85,7 @@ void Action::afterAdd(QString nameOperation)
             i++;
         }
     }
-    on_comboBox_4_currentIndexChanged(ui->comboBox_4->currentIndex());
+    choiceOperations(ui->comboBox_4->currentIndex());
 }
 bool Action::afterDelete()
 {
@@ -96,7 +98,7 @@ bool Action::afterDelete()
             {
                 ui->nameOperations->addItem(geom.name);
             }
-            on_comboBox_4_currentIndexChanged(ui->comboBox_4->currentIndex());
+            choiceOperations(ui->comboBox_4->currentIndex());
             return true;
         }
     }
@@ -228,7 +230,7 @@ void Action::on_DeleteOperation_clicked()
     }
 }
 
-void Action::on_comboBox_4_currentIndexChanged(int index)
+void Action::choiceOperations(int index)
 {
     if(index == 0)
     {
@@ -263,7 +265,7 @@ void Action::on_comboBox_4_currentIndexChanged(int index)
     }
 }
 
-void Action::on_comboBox_currentIndexChanged(const QString &arg1)
+void Action::showLineEdit(const QString &arg1)
 {
     foreach(Geometry ops, *allOperations)
     {
